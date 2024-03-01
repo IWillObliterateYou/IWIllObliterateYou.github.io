@@ -1,9 +1,18 @@
-let initialStateStart = true; // is the game at its default state
+// initiallizing variables
+let initialStateStart;
+let rectWidth;
+let rectHeight;
+let buttonX;
+let buttonY;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   
-  let buttonX = width / 5; // x of initial button
-  let buttonY = (height / 7) * 5; // y of initial button
+  initialStateStart = true; // is the game at its default state
+  rectWidth = random(35, 101); // size range of button width-wise
+  rectHeight = random(25, 71); // size range of button heigthwise
+  buttonX = random(0, width - rectWidth); // x pos of initial button
+  buttonY = random(0, height - rectHeight); // y pos of initial button
 }
 
 function draw() {
@@ -13,13 +22,14 @@ function draw() {
 
 // create and manage the starting screen
 function startScreen() {
-  fill('red');
+  fill("red");
   if (initialStateStart) {
-    rect(buttonX, buttonY, width / 5, height / 7, 5);
+    rect(buttonX, buttonY, rectWidth, rectHeight, 5);
 
     // is the button pressed
-    if (mouseIsPressed && mouseX >= width / 5 && mouseX <= (width / 5) * 2 && mouseY >= (height / 7) * 5 && mouseY <= (height / 7) * 6) {
-      initialStateStart = !initialStateStart; // trigger identifiable change to tell the button it can move now
+    if (mouseIsPressed && mouseX >= buttonX && mouseX <= buttonX + rectWidth && mouseY >= buttonY && mouseY <= buttonY + rectHeight) {
+    //  initialStateStart = !initialStateStart; // trigger identifiable change to tell the button it can move now
+      fill("blue")
     }
   }
 }
