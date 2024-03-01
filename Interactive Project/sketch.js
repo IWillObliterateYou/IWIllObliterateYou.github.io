@@ -1,6 +1,6 @@
 let initialStateStart = true; // is the game at its default state
 function setup() {
-  createCanvas(750, 600);
+  createCanvas(windowWidth, windowHeight);
   
   let buttonX = width / 5; // x of initial button
   let buttonY = (height / 7) * 5; // y of initial button
