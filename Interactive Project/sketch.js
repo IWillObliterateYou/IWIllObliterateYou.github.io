@@ -7,6 +7,7 @@ let buttonY;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  fill("red");
   
   initialStateStart = true; // is the game at its default state
   rectWidth = random(35, 101); // size range of button width-wise
@@ -22,14 +23,17 @@ function draw() {
 
 // create and manage the starting screen
 function startScreen() {
-  fill("red");
   if (initialStateStart) {
     rect(buttonX, buttonY, rectWidth, rectHeight, 5);
 
     // is the button pressed
     if (mouseIsPressed && mouseX >= buttonX && mouseX <= buttonX + rectWidth && mouseY >= buttonY && mouseY <= buttonY + rectHeight) {
-    //  initialStateStart = !initialStateStart; // trigger identifiable change to tell the button it can move now
-      fill("blue")
+      //initialStateStart = !initialStateStart; // trigger identifiable change to tell the button it can move now
+      fill("blue");
     }
   }
+}
+
+function moveButton() {
+  
 }
