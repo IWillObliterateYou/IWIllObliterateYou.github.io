@@ -5,7 +5,19 @@ let rectHeight;
 let buttonX;
 let buttonY;
 let buttonsToEnter;
-let i;
+let platWidth;
+let platHeight;
+let platX;
+let platY;
+let xPos = 0;
+let yPos = 0;
+let i = 0; // counter
+let platformSet = false; // checks to see if the platform's varibles have been set yet
+let character;
+
+function preload() {
+  character = loadImage("character.png");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -15,13 +27,15 @@ function setup() {
   rectHeight = height / 7; // size range of button heigthwise
   buttonX = width / 2 - rectWidth / 2; // x pos of initial button
   buttonY = height / 3 * 2 - rectHeight / 4; // y pos of initial button
-  buttonsToEnter = random(1, 7); // number of times you must hit the button after the initial press for the game to load
+  buttonsToEnter = floor(random(2, 9)); // number of times you must hit the button after the initial press for the game to load
 }
 
 function draw() {
   background("black");
-  startScreen();
+//  startScreen();
 
+
+  platformerState();
 }
 
 // create and manage the starting screen
@@ -33,18 +47,15 @@ function startScreen() {
 
   drawButton();
 
-  // is the button pressed
+  // detects buttons presses with the enclosed if statement and repeats moving and drawing the button a number of times equal to buttonsToEnter
   if (initialStateStart) {
-// add to if statement \/ checking if button pressed less than number of times
-
-
-//    for (i = 0; i < buttonsToEnter; i ++) {
-      if (mouseIsPressed && mouseX >= buttonX && mouseX <= buttonX + rectWidth && mouseY >= buttonY && mouseY <= buttonY + rectHeight) {
-        initialStateStart = !initialStateStart; // trigger identifiable change to tell the program the button has been pressed for the first time
-        moveButton();
-        drawButton();
-      }
-    console.log("done");
+    if (mouseIsPressed && mouseX >= buttonX && mouseX <= buttonX + rectWidth && mouseY >= buttonY && mouseY <= buttonY + rectHeight && i < buttonsToEnter) {
+      initialStateStart = !initialStateStart; // trigger identifiable change to tell the program the button has been pressed for the first time
+      moveButton();
+      drawButton();
+      i ++;
+      console.log(i);
+    }
   }
 }
 
@@ -56,10 +67,50 @@ function moveButton() { // moves the button to a new location
   initialStateStart = !initialStateStart;
 }
 
-function drawButton() {
+function drawButton() { // creating and positioning the button
   fill("red");
   rect(buttonX, buttonY, rectWidth, rectHeight, 5);
   fill("black");
   textAlign(CENTER, CENTER);
   text("Press", buttonX + rectWidth / 2, buttonY + rectHeight / 2);
+}
+
+function platformerState() {
+//  for (let i = 0; i < 6 ; i++) { // draws 5 platforms
+    drawPlatform();
+//  }
+  platformSet = true; // prevents platform movement
+  drawCharacter();
+}
+
+// draws a platform at platX, platY, with a width of platWidth and a height of platHeight, all of which are contained to this function
+function drawPlatform() {
+  if (!platformSet) {
+    platWidth = random(25, width / 2);
+    platHeight = random(10, 40);
+    platX = random(0, width - platWidth);
+    platY = random(50,  height - platHeight);
+  }
+  rect(platX, platY, platWidth, platHeight);
+}
+
+function drawCharacter() { // draws and moves character
+  image(character, width / 2 - character.width / 2 + xPos, height - character.height - yPos, character.width, character.height);
+
+  if (keyIsDown(68)) { // moves character right
+    xPos += 5;
+  }
+  if (keyIsDown(65)) { // moves character left
+    xPos -= 5;
+  }
+
+  gravity();
+}
+
+function gravity() { // makes character fall
+  yPos -= 15;
+}
+
+function collision() { // detects if character is touching platform
+
 }
