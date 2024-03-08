@@ -14,6 +14,7 @@ let yPos = 0;
 let i = 0; // counter
 let platformSet = false; // checks to see if the platform's varibles have been set yet
 let character;
+let hasJumped = false;
 
 function preload() {
   character = loadImage("character.png");
@@ -97,18 +98,22 @@ function drawPlatform() {
 function drawCharacter() { // draws and moves character
   image(character, width / 2 - character.width / 2 + xPos, height - character.height - yPos, character.width, character.height);
 
-  if (keyIsDown(68)) { // moves character right
+  if (keyIsDown(68)) { // moves character right with "d"
     xPos += 5;
   }
-  if (keyIsDown(65)) { // moves character left
+  if (keyIsDown(65)) { // moves character left with "a"
     xPos -= 5;
   }
-
+  if (key === " " && hasJumped === false) {
+    yPos += 50; 
+    key = "h";
+    hasJumped = true;
+  }
   gravity();
 }
 
 function gravity() { // makes character fall
-  yPos -= 15;
+  yPos -= 1;
 }
 
 function collision() { // detects if character is touching platform
