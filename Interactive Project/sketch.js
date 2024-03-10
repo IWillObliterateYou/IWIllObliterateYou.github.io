@@ -14,9 +14,9 @@ let yPos = 0;
 let i = 0; // counter
 let platformSet = false; // checks to see if the platform's varibles have been set yet
 let character;
-let hasJumped = false;
+let canJump = false;
 let hit;
-let timer;
+let timer = -1000;
 
 function preload() {
   character = loadImage("character.png");
@@ -57,7 +57,6 @@ function startScreen() {
       moveButton();
       drawButton();
       i ++;
-      console.log(i);
     }
   }
 }
@@ -80,9 +79,9 @@ function drawButton() { // creating and positioning the button
 
 function platformerState() {
 //  for (let i = 0; i < 6 ; i++) { // draws 5 platforms
-    drawPlatform();
+//    drawPlatform();
 //  }
-  platformSet = true; // prevents platform movement
+//  platformSet = true; // prevents platform movement
   drawCharacter();
 }
 
@@ -106,24 +105,45 @@ function drawCharacter() { // draws and moves character
   if (keyIsDown(65)) { // moves character left with "a"
     xPos -= 5;
   }
-  if (millis() >= timer + 1000) { // checks if enough time has passed to allow another jump
-    hasJumped = true;
+  if (keyIsDown(87)) { // moves character right with "w"
+    yPos += 5;
   }
-  if (key === " " && hasJumped === false) { // jumping
+  if (keyIsDown(83)) { // moves character left with "s"
+    yPos -= 5;
+  }
+
+  // if (key === " ") { // jumping
+  //   yPos += 250; 
+  //   key = "h";
+  // }
+  // collision();
+  // gravity();
+
+  if (canJump && keyIsDown(32) && millis() - 1000 >= timer) {
+    yPos += 250;
+    canJump = false;
     timer = millis();
-    yPos += 250; 
-    key = "h";
-    // still not working
   }
+
   gravity();
 }
 
 function gravity() { // makes character fall
-  if (!hit) {
-    yPos -= 1;
+  if (height - yPos < height) {
+    yPos -= 3;
+    canJump = false;
+  } else {
+    canJump = true;
   }
 }
 
 function collision() { // detects if character is touching platform
-  hit = collideRectRect(platX, platY, platWidth, platHeight, width / 2 - character.width / 2 + xPos, height - character.height - yPos, character.width, character.height);
+// does not work, if ever collideRectRect is run, the character stops moving
+//  hit = collideRectRect(platX, platY, platWidth, platHeight, width / 2 - character.width / 2 + xPos, height - character.height - yPos, character.width, character.height); 
+
+//  hit = hit || yPos + character.height >= height; // also detects if character is touching the bottom of the canvas
+  // if (hit) {
+  //   fill("red");
+  // }
+
 }
