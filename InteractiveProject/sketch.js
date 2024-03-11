@@ -1,3 +1,8 @@
+// Extra for Experts
+// 
+
+
+
 // initiallizing variables
 let buttonSwitcher;
 let rectWidth;
@@ -114,11 +119,14 @@ function drawCharacter() { // draws and moves character
   if (keyIsDown(68) && xPos + 10 <= width / 2 - character.width / 4) { // moves character right with "d"
     xPos += 10;
     if (xPos + character.width > width / 2) {
-      xPos = width - character.width;
+      xPos = width / 2 - character.width / 2;
     }
   }
   if (keyIsDown(65) && xPos - 10 >= 0 - width / 2 + character.width / 4) { // moves character left with "a"
     xPos -= 10;
+    if (xPos < 0 - width / 2 + character.width / 2) {
+      xPos = 0 - width / 2 + character.width / 2;
+    }
   }
 
   // for troubleshooting
