@@ -1,5 +1,5 @@
 // initiallizing variables
-let initialStateStart;
+let buttonSwitcher;
 let rectWidth;
 let rectHeight;
 let buttonX;
@@ -17,32 +17,42 @@ let character;
 let canJump = false;
 let hit;
 let timer = -1000;
+let timer2 = 0; // for the jumping "animation"
+let gravityStrength = 0.4; // called every frame, keep low
+let yVelocity = 0;
+let stateChanged = false; // indicates whether in start screen or in game state
+
+
 
 function preload() {
   character = loadImage("character.png");
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight); // if the window running the code is too small, the jump will extend above the screen
 
-  initialStateStart = true; // is the game at its default state
+  buttonSwitcher = true; // is the game at its default state
   rectWidth = width / 7; // size range of button width-wise
   rectHeight = height / 7; // size range of button heigthwise
   buttonX = width / 2 - rectWidth / 2; // x pos of initial button
   buttonY = height / 3 * 2 - rectHeight / 4; // y pos of initial button
-  buttonsToEnter = floor(random(2, 9)); // number of times you must hit the button after the initial press for the game to load
+  buttonsToEnter = floor(random(3, 9)); // number of times you must hit the button after the initial press for the game to load
 }
 
 function draw() {
   background("black");
-//  startScreen();
-
-
-  platformerState();
+  if (!stateChanged) {
+    startScreen();
+  } else {
+    platformerState();
+  }
 }
 
 // create and manage the starting screen
 function startScreen() {
+  if (i === buttonsToEnter) {
+    stateChanged = true;
+  }
   fill("white");
   textSize(30);
   textAlign(CENTER, CENTER);
@@ -51,12 +61,14 @@ function startScreen() {
   drawButton();
 
   // detects buttons presses with the enclosed if statement and repeats moving and drawing the button a number of times equal to buttonsToEnter
-  if (initialStateStart) {
+  if (buttonSwitcher) {
     if (mouseIsPressed && mouseX >= buttonX && mouseX <= buttonX + rectWidth && mouseY >= buttonY && mouseY <= buttonY + rectHeight && i < buttonsToEnter) {
-      initialStateStart = !initialStateStart; // trigger identifiable change to tell the program the button has been pressed for the first time
-      moveButton();
-      drawButton();
       i ++;
+      if (i < buttonsToEnter) { // a second check to tell if we need to run this function again, this prevents flashing one frame of what would be the next startScreen before the platformerState
+        buttonSwitcher = !buttonSwitcher; // trigger identifiable change to tell the program the button has been pressed for the first time
+        moveButton();
+        drawButton();
+      }
     }
   }
 }
@@ -66,7 +78,7 @@ function moveButton() { // moves the button to a new location
   buttonY = random(0, height - rectHeight);
   rectWidth = random(65, 121);
   rectHeight = random(25, 91);
-  initialStateStart = !initialStateStart;
+  buttonSwitcher = !buttonSwitcher;
 }
 
 function drawButton() { // creating and positioning the button
@@ -99,28 +111,24 @@ function drawPlatform() {
 function drawCharacter() { // draws and moves character
   image(character, width / 2 - character.width / 2 + xPos, height - character.height - yPos, character.width, character.height);
 
-  if (keyIsDown(68)) { // moves character right with "d"
-    xPos += 5;
+  if (keyIsDown(68) && xPos + 10 <= width / 2 - character.width / 4) { // moves character right with "d"
+    xPos += 10;
   }
-  if (keyIsDown(65)) { // moves character left with "a"
-    xPos -= 5;
-  }
-  if (keyIsDown(87)) { // moves character right with "w"
-    yPos += 5;
-  }
-  if (keyIsDown(83)) { // moves character left with "s"
-    yPos -= 5;
+  if (keyIsDown(65) && xPos - 10 >= 0 - width / 2 + character.width / 4) { // moves character left with "a"
+    xPos -= 10;
   }
 
-  // if (key === " ") { // jumping
-  //   yPos += 250; 
-  //   key = "h";
+  // for troubleshooting
+  // if (keyIsDown(87)) { // moves character right with "w"
+  //   yPos += 5;
   // }
-  // collision();
-  // gravity();
+  // if (keyIsDown(83)) { // moves character left with "s"
+  //   yPos -= 5;
+  // }
 
-  if (canJump && keyIsDown(32) && millis() - 1000 >= timer) {
-    yPos += 250;
+  if (canJump && keyIsDown(32) && millis() - 1000 >= timer) { // jumping
+
+    yVelocity += 20;
     canJump = false;
     timer = millis();
   }
@@ -129,11 +137,23 @@ function drawCharacter() { // draws and moves character
 }
 
 function gravity() { // makes character fall
-  if (height - yPos < height) {
-    yPos -= 3;
+
+  // checks to see if character hits ceiling, if it does, lower it to ceiling so gravity can take care of it
+  // weird bug, if character hits the ceiling, when they hit the ground it seems to stop them prematurly at a distance of yVelocity, gravity fixes the problem but it persists nonetheless
+  if (height - character.height - yPos >= 0) {
+    yPos += yVelocity;
+  } else {
+    yPos = height - character.height;
+    yVelocity = 0;
+  }
+
+  // makes character stop falling when hitting the ground
+  if (height - yPos - yVelocity < height) { 
+    yVelocity -= gravityStrength;
     canJump = false;
   } else {
     canJump = true;
+    yVelocity = 0;
   }
 }
 
