@@ -113,6 +113,9 @@ function drawCharacter() { // draws and moves character
 
   if (keyIsDown(68) && xPos + 10 <= width / 2 - character.width / 4) { // moves character right with "d"
     xPos += 10;
+    if (xPos + character.width > width / 2) {
+      xPos = width - character.width;
+    }
   }
   if (keyIsDown(65) && xPos - 10 >= 0 - width / 2 + character.width / 4) { // moves character left with "a"
     xPos -= 10;
@@ -127,7 +130,6 @@ function drawCharacter() { // draws and moves character
   // }
 
   if (canJump && keyIsDown(32) && millis() - 1000 >= timer) { // jumping
-
     yVelocity += 20;
     canJump = false;
     timer = millis();

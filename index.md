@@ -1,11 +1,10 @@
 # My CompSci 30 Stuff 
 
 ## Demos
-- [Traffic Light](Traffic Light)
-- [Interactive Scene](Interactive Project)
-- [Bouncing Ball](Bouncing Ball)
+- [Traffic Light](TrafficLight)
+- [Bouncing Ball](BouncingBall)
 - [Collision Demo](collision)
 
 
 ## Projects
-- Interactive Scene
+- [Interactive Scene](InteractiveProject)
