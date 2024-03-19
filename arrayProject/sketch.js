@@ -8,33 +8,69 @@
 
 // Stardew style terrain generators
 
-let terrainLevelOne = [];
-let numberOfLayers = 20;
+let terrain = [];
+let numberOfLayers = 5;
 let tileSize;
+let tileY;
+let tileHeight;
+let characterXPos;
+let characterYPos;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  generateLayer;
+  // generateField;
+  tileHeight = height / tileSize;
+  tileSize = height / 25;
+  generateField();
+
+  characterXPos = width / 2;
+  characterYPos = height / 2;
 }
 
 function draw() {
   background("green");
-  for (let thisTile of terrainLevelOne) {
-    square()
+
+  for (let thisTile of terrain) {
+    fill("brown");
+    square(thisTile.x, thisTile.y, thisTile.s);
   }
+
+  drawCharacter();
 }
 
-function createTile(cornerX, tileSize) {
+function createTile(cornerX, cornerY) {
   let thisTile = {
     x: cornerX,
-    y: 0,
+    y: cornerY,
     s: tileSize,
-  }
-  terrainLevelOne.push;
+  };
+  terrain.push(thisTile);
 }
 
-function generateLayer() {
-  for (let i; i < width / tileSize; i ++) {
-    createTile(i * tileSize, tileSize);
+function generateField() {
+  for (let cornerY = 0; cornerY < height; cornerY +=  tileSize) { // generating columns
+    for (let cornerX = 0; cornerX < width; cornerX += tileSize) { // generating rows
+      if (random(1) >=  0.99) {
+        createTile(cornerX, cornerY);
+      } 
+    }
+  }
+}
+
+function drawCharacter() {
+  fill("teal");
+  square(characterXPos, characterYPos, tileSize);
+
+  if (keyIsDown(68)) { // moves character right with "d"
+    characterXPos += 10;
+    if (characterXPos + tileSize > width) {
+      characterXPos = width / 2 - tileSize / 2;
+    }
+  }
+  if (keyIsDown(65)) { // moves character left with "a"
+    characterXPos -= 10;
+    if (characterXPos > 0) {
+      characterXPos = 0 - width / 2 + tileSize / 2;
+    }
   }
 }
