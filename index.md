@@ -8,6 +8,7 @@
 - [Generative Art](generativeArt)
 - [Arrays and Object Notation Project](arrayProject)
 - [Terrain Generation](TerrainGeneration)
+- [Translate/Rotate](translate)
 
 ## Projects
 - [Interactive Scene](InteractiveProject)
