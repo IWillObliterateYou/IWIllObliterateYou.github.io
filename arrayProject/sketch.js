@@ -15,6 +15,7 @@ let tileY;
 let tileHeight;
 let characterXPos;
 let characterYPos;
+let hit;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -36,6 +37,11 @@ function draw() {
   }
 
   drawCharacter();
+
+  for (let thisTile of terrain) {
+    hit = collideRectRect(thisTile.x, thisTile.y, thisTile.x + tileSize, thisTile.y + tileSize);
+    console.log(hit);
+  }
 }
 
 function createTile(cornerX, cornerY) {
@@ -64,13 +70,25 @@ function drawCharacter() {
   if (keyIsDown(68)) { // moves character right with "d"
     characterXPos += 10;
     if (characterXPos + tileSize > width) {
-      characterXPos = width / 2 - tileSize / 2;
+      characterXPos = width - tileSize;
     }
   }
   if (keyIsDown(65)) { // moves character left with "a"
     characterXPos -= 10;
-    if (characterXPos > 0) {
-      characterXPos = 0 - width / 2 + tileSize / 2;
+    if (characterXPos < 0) {
+      characterXPos = 0;
+    }
+  }
+  if (keyIsDown(83)) { // moves character right with "s"
+    characterYPos += 10;
+    if (characterYPos + tileSize > height) {
+      characterYPos = height - tileSize;
+    }
+  }
+  if (keyIsDown(87)) { // moves character left with "w"
+    characterYPos -= 10;
+    if (characterYPos < 0) {
+      characterYPos = 0;
     }
   }
 }
