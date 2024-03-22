@@ -34,14 +34,24 @@ function draw() {
   for (let thisTile of terrain) {
     fill("brown");
     square(thisTile.x, thisTile.y, thisTile.s);
+    thisTile.amIHit = collideRectRect(thisTile.x, thisTile.y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
+
+    if (thisTile.amIHit) {
+      fill("red");
+    }
+    else {
+      fill("teal");
+    }
+  }
+
+  if (hit) {
+    fill("red");
+  }
+  else {
+    fill("teal");
   }
 
   drawCharacter();
-
-  for (let thisTile of terrain) {
-    hit = collideRectRect(thisTile.x, thisTile.y, thisTile.x + tileSize, thisTile.y + tileSize);
-    console.log(hit);
-  }
 }
 
 function createTile(cornerX, cornerY) {
@@ -49,6 +59,7 @@ function createTile(cornerX, cornerY) {
     x: cornerX,
     y: cornerY,
     s: tileSize,
+    amIHit: false,
   };
   terrain.push(thisTile);
 }
@@ -64,7 +75,7 @@ function generateField() {
 }
 
 function drawCharacter() {
-  fill("teal");
+
   square(characterXPos, characterYPos, tileSize);
 
   if (keyIsDown(68)) { // moves character right with "d"
