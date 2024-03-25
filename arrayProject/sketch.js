@@ -3,7 +3,7 @@
 // Date
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - slicing arrays
 
 
 // Stardew style terrain generators
@@ -34,7 +34,6 @@ function draw() {
   for (let thisTile of terrain) {
     fill("brown");
     square(thisTile.x, thisTile.y, thisTile.s);
-    amIHit = collideRectRect(thisTile.x, thisTile.y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
   }
 
   drawCharacter();
@@ -45,6 +44,7 @@ function createTile(cornerX, cornerY) {
     x: cornerX,
     y: cornerY,
     s: tileSize,
+    isHit: false,
   };
   terrain.push(thisTile);
 }
@@ -60,12 +60,15 @@ function generateField() {
 }
 
 function drawCharacter() {
+  fill("teal");
 
-  if (amIHit) {
-    fill("red");
-  }
-  else {
-    fill("teal");
+  for (let thisTile of terrain) {
+    let amIHit = collideRectRect(thisTile.x, thisTile.y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
+    thisTile.isHit = amIHit;
+
+    if (amIHit) {
+      fill("red");
+    }
   }
 
   square(characterXPos, characterYPos, tileSize);
@@ -92,6 +95,19 @@ function drawCharacter() {
     characterYPos -= 10;
     if (characterYPos < 0) {
       characterYPos = 0;
+    }
+  }
+}
+
+function tileKiller() {
+// there is a command for this
+
+
+  for (let i = 0; i < terrain.length; i ++) {
+    if (terrain[i].isHit) {
+      let deadStorage = terrain.splice(i);
+      terrain.pop();
+      terrain.push(deadStorage);
     }
   }
 }
