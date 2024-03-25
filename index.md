@@ -9,6 +9,7 @@
 - [Arrays and Object Notation Project](arrayProject)
 - [Terrain Generation](TerrainGeneration)
 - [Translate/Rotate](translate)
+- [Bubble Movement](bubble)
 
 ## Projects
 - [Interactive Scene](InteractiveProject)

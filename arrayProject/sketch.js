@@ -15,7 +15,7 @@ let tileY;
 let tileHeight;
 let characterXPos;
 let characterYPos;
-let hit;
+let amIHit;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -34,21 +34,7 @@ function draw() {
   for (let thisTile of terrain) {
     fill("brown");
     square(thisTile.x, thisTile.y, thisTile.s);
-    thisTile.amIHit = collideRectRect(thisTile.x, thisTile.y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
-
-    if (thisTile.amIHit) {
-      fill("red");
-    }
-    else {
-      fill("teal");
-    }
-  }
-
-  if (hit) {
-    fill("red");
-  }
-  else {
-    fill("teal");
+    amIHit = collideRectRect(thisTile.x, thisTile.y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
   }
 
   drawCharacter();
@@ -59,7 +45,6 @@ function createTile(cornerX, cornerY) {
     x: cornerX,
     y: cornerY,
     s: tileSize,
-    amIHit: false,
   };
   terrain.push(thisTile);
 }
@@ -75,6 +60,13 @@ function generateField() {
 }
 
 function drawCharacter() {
+
+  if (amIHit) {
+    fill("red");
+  }
+  else {
+    fill("teal");
+  }
 
   square(characterXPos, characterYPos, tileSize);
 
