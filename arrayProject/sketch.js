@@ -3,7 +3,7 @@
 // Date
 //
 // Extra for Experts:
-// - slicing arrays
+//
 
 
 // Stardew style terrain generators
@@ -16,6 +16,7 @@ let tileHeight;
 let characterXPos;
 let characterYPos;
 let amIHit;
+let i;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -31,9 +32,10 @@ function setup() {
 function draw() {
   background("green");
 
-  for (let thisTile of terrain) {
+  for (let i = terrain.length - 1; i >= 0; i --) {
     fill("brown");
-    square(thisTile.x, thisTile.y, thisTile.s);
+    square(terrain[i].x, terrain[i].y, terrain[i].s);
+    detectCharacterTileCollision(terrain[i]);
   }
 
   drawCharacter();
@@ -44,7 +46,7 @@ function createTile(cornerX, cornerY) {
     x: cornerX,
     y: cornerY,
     s: tileSize,
-    isHit: false,
+    isTileHit: false,
   };
   terrain.push(thisTile);
 }
@@ -60,17 +62,6 @@ function generateField() {
 }
 
 function drawCharacter() {
-  fill("teal");
-
-  for (let thisTile of terrain) {
-    let amIHit = collideRectRect(thisTile.x, thisTile.y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
-    thisTile.isHit = amIHit;
-
-    if (amIHit) {
-      fill("red");
-    }
-  }
-
   square(characterXPos, characterYPos, tileSize);
 
   if (keyIsDown(68)) { // moves character right with "d"
@@ -99,15 +90,19 @@ function drawCharacter() {
   }
 }
 
-function tileKiller() {
-// there is a command for this
+function detectCharacterTileCollision(i) {
+  for (let i = terrain.length - 1; i >= 0; i --) {
+    let amIHit = collideRectRect(terrain[i].x, terrain[i].y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
+    terrain[i].isTileHit = amIHit;
 
 
-  for (let i = 0; i < terrain.length; i ++) {
-    if (terrain[i].isHit) {
-      let deadStorage = terrain.splice(i);
-      terrain.pop();
-      terrain.push(deadStorage);
+    // broke colour again
+    
+    if (amIHit) {
+      fill("red");
+    }
+    else {
+      fill("teal");
     }
   }
 }
