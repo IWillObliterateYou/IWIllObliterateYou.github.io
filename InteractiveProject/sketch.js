@@ -48,7 +48,8 @@ function draw() {
   background("black");
   if (!stateChanged) {
     startScreen();
-  } else {
+  } 
+  else {
     platformerState();
   }
 }
@@ -152,7 +153,8 @@ function gravity() { // makes character fall
   // weird bug, if character hits the ceiling, when they hit the ground it seems to stop them prematurly at a distance of yVelocity, gravity fixes the problem but it persists nonetheless
   if (height - character.height - yPos >= 0) {
     yPos += yVelocity;
-  } else {
+  } 
+  else {
     yPos = height - character.height;
     yVelocity = 0;
   }
@@ -161,7 +163,8 @@ function gravity() { // makes character fall
   if (height - yPos - yVelocity < height) { 
     yVelocity -= gravityStrength;
     canJump = false;
-  } else {
+  } 
+  else {
     canJump = true;
     yVelocity = 0;
   }
@@ -171,7 +174,7 @@ function collision() { // detects if character is touching platform
 // does not work, if ever collideRectRect is run, the character stops moving
 //  hit = collideRectRect(platX, platY, platWidth, platHeight, width / 2 - character.width / 2 + xPos, height - character.height - yPos, character.width, character.height); 
 
-//  hit = hit || yPos + character.height >= height; // also detects if character is touching the bottom of the canvas
+  //  hit = hit || yPos + character.height >= height; // also detects if character is touching the bottom of the canvas
   // if (hit) {
   //   fill("red");
   // }

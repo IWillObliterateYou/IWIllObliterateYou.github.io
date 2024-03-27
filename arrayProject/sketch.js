@@ -5,6 +5,9 @@
 // Extra for Experts:
 //
 
+function preload() {
+  characterImage = loadImage("character.png");
+}
 
 // Stardew style terrain generators
 
@@ -16,7 +19,7 @@ let tileHeight;
 let characterXPos;
 let characterYPos;
 let amIHit;
-let i;
+let characterImage;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -35,6 +38,9 @@ function draw() {
   for (let i = terrain.length - 1; i >= 0; i --) {
     fill("brown");
     square(terrain[i].x, terrain[i].y, terrain[i].s);
+  }
+
+  for (let i = terrain.length - 1; i >= 0; i --) {
     detectCharacterTileCollision(terrain[i]);
   }
 
@@ -46,7 +52,6 @@ function createTile(cornerX, cornerY) {
     x: cornerX,
     y: cornerY,
     s: tileSize,
-    isTileHit: false,
   };
   terrain.push(thisTile);
 }
@@ -54,7 +59,7 @@ function createTile(cornerX, cornerY) {
 function generateField() {
   for (let cornerY = 0; cornerY < height; cornerY +=  tileSize) { // generating columns
     for (let cornerX = 0; cornerX < width; cornerX += tileSize) { // generating rows
-      if (random(1) >=  0.99) {
+      if (random(1) >=  0.98) {
         createTile(cornerX, cornerY);
       } 
     }
@@ -62,7 +67,7 @@ function generateField() {
 }
 
 function drawCharacter() {
-  square(characterXPos, characterYPos, tileSize);
+  image(characterImage, characterXPos, characterYPos, tileSize, tileSize);
 
   if (keyIsDown(68)) { // moves character right with "d"
     characterXPos += 10;
@@ -92,17 +97,10 @@ function drawCharacter() {
 
 function detectCharacterTileCollision(i) {
   for (let i = terrain.length - 1; i >= 0; i --) {
-    let amIHit = collideRectRect(terrain[i].x, terrain[i].y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize);
-    terrain[i].isTileHit = amIHit;
-
-
-    // broke colour again
-    
-    if (amIHit) {
-      fill("red");
-    }
-    else {
-      fill("teal");
+    if (collideRectRect(terrain[i].x, terrain[i].y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize)) {
+      terrain.splice([i], 1);
     }
   }
+
+  fill("teal");
 }
