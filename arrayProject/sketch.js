@@ -7,6 +7,8 @@
 
 function preload() {
   characterImage = loadImage("character.png");
+  characterImageFlipped = loadImage("characterFlipped.png");
+  knightImage = loadImage("knight.png");
 }
 
 // Stardew style terrain generators
@@ -20,6 +22,12 @@ let characterXPos;
 let characterYPos;
 let amIHit;
 let characterImage;
+let knightImage;
+let inCombat = false;
+let victorious;
+let attackButton;
+let defendButton;
+let characterImageFlipped;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -33,18 +41,28 @@ function setup() {
 }
 
 function draw() {
-  background("green");
-
-  for (let i = terrain.length - 1; i >= 0; i --) {
-    fill("brown");
-    square(terrain[i].x, terrain[i].y, terrain[i].s);
+  if (!inCombat) {
+    background("green");
+  }
+  else {
+    background("teal");
   }
 
-  for (let i = terrain.length - 1; i >= 0; i --) {
-    detectCharacterTileCollision(terrain[i]);
-  }
+  if (!inCombat) {
+    for (let i = terrain.length - 1; i >= 0; i --) {
+      fill("brown");
+      image(knightImage, terrain[i].x, terrain[i].y, terrain[i].s, terrain[i].s);
+    }
 
-  drawCharacter();
+    for (let i = terrain.length - 1; i >= 0; i --) {
+      detectCharacterTileCollision(terrain[i]);
+    }
+
+    drawCharacterInField();
+  }
+  else {
+    battleScreen();
+  }
 }
 
 function createTile(cornerX, cornerY) {
@@ -66,7 +84,7 @@ function generateField() {
   }
 }
 
-function drawCharacter() {
+function drawCharacterInField() {
   image(characterImage, characterXPos, characterYPos, tileSize, tileSize);
 
   if (keyIsDown(68)) { // moves character right with "d"
@@ -98,9 +116,25 @@ function drawCharacter() {
 function detectCharacterTileCollision(i) {
   for (let i = terrain.length - 1; i >= 0; i --) {
     if (collideRectRect(terrain[i].x, terrain[i].y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize)) {
-      terrain.splice([i], 1);
+      inCombat = true;
+      if (victorious) {
+        terrain.splice([i], 1);
+      }
     }
   }
 
   fill("teal");
+}
+
+function battleScreen() {
+  inCombat = true;
+
+  stroke("white");
+  fill(40, 20, 20);
+  attackButton = rect(width / 7, height / 8 * 6, width / 7 * 2, height / 8);
+  defendButton = rect(width / 7 * 4, height / 8 * 6, width / 7 * 2, height / 8);
+
+  image(characterImageFlipped, width / 6, height / 3, tileSize * 7, tileSize * 7);
+
+  image(knightImage, width / 5 * 3.5, height / 3, tileSize * 7, tileSize * 7);
 }
