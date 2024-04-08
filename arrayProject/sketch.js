@@ -5,10 +5,13 @@
 // Extra for Experts:
 // 
 
+let fieldMusic;
+
 function preload() {
   characterImage = loadImage("character.png");
   characterImageFlipped = loadImage("characterFlipped.png");
   knightImage = loadImage("knight.png");
+  fieldMusic = loadSound("fieldMusic.mp3");
 }
 
 // initializing variables
@@ -22,7 +25,7 @@ let amIHit;
 let characterImage;
 let knightImage;
 let inCombat = false;
-let victorious;
+let victorious = false;
 let attackButton;
 let defendButton;
 let characterImageFlipped;
@@ -38,6 +41,7 @@ let betweenTurnsDelayValue = 1500;
 let playerDamage = 25;
 let delayBetweenCombats = -100;
 let gameOver = false;
+let delayBetweenTurnsTimer;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -47,6 +51,10 @@ function setup() {
 
   characterXPos = width / 2;
   characterYPos = height / 2;
+
+  fieldMusic.jump(0);
+  fieldMusic.play();
+  fieldMusic.setLoop(true);
 }
 
 function draw() {
@@ -136,12 +144,13 @@ function detectCharacterTileCollision(i) {
       // the delay is basically unnoticible so it shouldn't affect anything besides fixing that bug
       if (delayBetweenCombats + 100 <= millis()) {
         inCombat = true;
+        victorious = false;
+        isYourTurn = true;
       }
       currentEnemyHealth = maximumEnemyHealth; // resets the singular enemy health bar to full because they all share one
       // quick check to remove the enemy from the array
       if (victorious) {
         terrain.splice([i], 1);
-        victorious = false;
       }
     }
   }
@@ -178,7 +187,7 @@ function battleScreen() {
 
   // draw your healthbar
   noStroke();
-  fill("black")
+  fill("black");
   rect(width / 7, height / 8, width / 7 * 2, height / 16);
   fill("red");
   playerHealthBar = rect(width / 7, height / 8, currentHealth / 100 * width / 7 * 2, height / 16);
@@ -200,15 +209,15 @@ function turnBasedBackAndForth() {
   if (isYourTurn) {
     // check if you're hitting the attack button on your turn and subtract 20 from the enemy healthbar
     if (mouseIsPressed && mouseX > width / 7 && mouseX < width / 7 * 3 && mouseY > height / 8 * 6 && mouseY < height / 8 * 7) {
-    currentEnemyHealth -= playerDamage;
-    isYourTurn = false; // this is not a != toggle because its easier to keep track of
-    delayBetweenTurnsTimer = millis();
+      currentEnemyHealth -= playerDamage;
+      isYourTurn = false; // this is not a != toggle because its easier to keep track of
+      delayBetweenTurnsTimer = millis();
     }
     // check if you're hitting the defend button on your turn and tell the game you're defending
     else if (mouseIsPressed && mouseX > width / 7 * 4 && mouseX < width / 7 * 6 && mouseY > height / 8 * 6 && mouseY < height / 8 * 7) {
-    areYouDefending = true;
-    isYourTurn = false; // this is not a != toggle because its easier to keep track of
-    delayBetweenTurnsTimer = millis();
+      areYouDefending = true;
+      isYourTurn = false; // this is not a != toggle because its easier to keep track of
+      delayBetweenTurnsTimer = millis();
     }
   }
   // this branch of the isYourTurn statement controls the enemy's turn
@@ -238,6 +247,3 @@ function turnBasedBackAndForth() {
     gameOver = true;
   }
 }
-
-// I noticed a bug where after you kill an enemy the attack the enemy would have made if you hadn't killed them with your previous attack will still subtract from your health
-// I cannot seem to fix it as all my attempts have been fruitless
