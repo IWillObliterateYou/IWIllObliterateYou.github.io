@@ -1,9 +1,9 @@
-// Project Title
-// Your Name
-// Date
+// Array Project
+// Seth Gardiner
+// April 8th, 2024
 //
 // Extra for Experts:
-//
+// 
 
 function preload() {
   characterImage = loadImage("character.png");
@@ -11,13 +11,11 @@ function preload() {
   knightImage = loadImage("knight.png");
 }
 
-// Stardew style terrain generators
-
+// initializing variables
 let terrain = [];
 let numberOfLayers = 5;
 let tileSize;
 let tileY;
-let tileHeight;
 let characterXPos;
 let characterYPos;
 let amIHit;
@@ -28,11 +26,22 @@ let victorious;
 let attackButton;
 let defendButton;
 let characterImageFlipped;
+let playerHealthBar;
+let currentHealth = 100;
+let enemyHealthBar;
+let maximumEnemyHealth = 100;
+let currentEnemyHealth = maximumEnemyHealth;
+let isYourTurn = true;
+let areYouDefending = false;
+let enemyDamage = 15;
+let betweenTurnsDelayValue = 1500;
+let playerDamage = 25;
+let delayBetweenCombats = -100;
+let gameOver = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  // generateField;
-  tileHeight = height / tileSize;
+  // decide on the size of tiles and decide where the enemies are placed with generateField()
   tileSize = height / 25;
   generateField();
 
@@ -41,27 +50,31 @@ function setup() {
 }
 
 function draw() {
-  if (!inCombat) {
-    background("green");
+  // all visible functionality is dependant upon not being in the gameOver state
+  if (!gameOver) {
+    // check whether or not to initiate the combat sequence, if not, display the enemies and do the check for if you hit an enemy, as well as the walls
+    if (!inCombat) {
+      background("green");
+      for (let i = terrain.length - 1; i >= 0; i --) {
+        fill("brown");
+        image(knightImage, terrain[i].x, terrain[i].y, terrain[i].s, terrain[i].s);
+      }
+
+      for (let i = terrain.length - 1; i >= 0; i --) {
+        detectCharacterTileCollision(terrain[i]);
+      }
+
+      drawCharacterInField();
+    }
+    else {
+      battleScreen();
+    }
   }
   else {
-    background("teal");
-  }
-
-  if (!inCombat) {
-    for (let i = terrain.length - 1; i >= 0; i --) {
-      fill("brown");
-      image(knightImage, terrain[i].x, terrain[i].y, terrain[i].s, terrain[i].s);
-    }
-
-    for (let i = terrain.length - 1; i >= 0; i --) {
-      detectCharacterTileCollision(terrain[i]);
-    }
-
-    drawCharacterInField();
-  }
-  else {
-    battleScreen();
+    background("black");
+    fill("black");
+    stroke("white");
+    text("Game Over", width / 2, height / 2);
   }
 }
 
@@ -74,6 +87,7 @@ function createTile(cornerX, cornerY) {
   terrain.push(thisTile);
 }
 
+// decide where enemies are
 function generateField() {
   for (let cornerY = 0; cornerY < height; cornerY +=  tileSize) { // generating columns
     for (let cornerX = 0; cornerX < width; cornerX += tileSize) { // generating rows
@@ -84,6 +98,7 @@ function generateField() {
   }
 }
 
+// draw the character and do the movement and wall collision detection
 function drawCharacterInField() {
   image(characterImage, characterXPos, characterYPos, tileSize, tileSize);
 
@@ -113,12 +128,20 @@ function drawCharacterInField() {
   }
 }
 
+// detect if your hitting an enemy
 function detectCharacterTileCollision(i) {
   for (let i = terrain.length - 1; i >= 0; i --) {
     if (collideRectRect(terrain[i].x, terrain[i].y, tileSize, tileSize, characterXPos, characterYPos, tileSize, tileSize)) {
-      inCombat = true;
+      // this delay is required because without it the inCombat = true; line gets called 15+ times instantly when it should only be called once
+      // the delay is basically unnoticible so it shouldn't affect anything besides fixing that bug
+      if (delayBetweenCombats + 100 <= millis()) {
+        inCombat = true;
+      }
+      currentEnemyHealth = maximumEnemyHealth; // resets the singular enemy health bar to full because they all share one
+      // quick check to remove the enemy from the array
       if (victorious) {
         terrain.splice([i], 1);
+        victorious = false;
       }
     }
   }
@@ -126,15 +149,95 @@ function detectCharacterTileCollision(i) {
   fill("teal");
 }
 
+// run the combat sequence
 function battleScreen() {
-  inCombat = true;
-
+  background("teal");
+  // draw the attack button
   stroke("white");
   fill(40, 20, 20);
   attackButton = rect(width / 7, height / 8 * 6, width / 7 * 2, height / 8);
+  stroke("black");
+  textSize(100);
+  textAlign(CENTER, CENTER);
+  fill("White");
+  text("Attack", width / 7 * 2, height / 16 * 13);
+
+  // draw the defend button. 
+  // For clarity, yes I'm aware that this button is pointless for strategy reasons and should never be used if you want to win. This game isn't complicated enough to warrent it. 
+  fill(40, 20, 20);
+  stroke("white");
   defendButton = rect(width / 7 * 4, height / 8 * 6, width / 7 * 2, height / 8);
+  stroke("black");
+  fill("White");
+  text("Defend", width / 7 * 5, height / 16 * 13);
 
-  image(characterImageFlipped, width / 6, height / 3, tileSize * 7, tileSize * 7);
+  // draw the character and enemy in the combat sequence
+  image(characterImageFlipped, width / 7, height / 3, tileSize * 7, tileSize * 7);
 
-  image(knightImage, width / 5 * 3.5, height / 3, tileSize * 7, tileSize * 7);
+  image(knightImage, width / 7 * 6 - tileSize * 7, height / 3, tileSize * 7, tileSize * 7);
+
+  // draw your healthbar
+  noStroke();
+  fill("black")
+  rect(width / 7, height / 8, width / 7 * 2, height / 16);
+  fill("red");
+  playerHealthBar = rect(width / 7, height / 8, currentHealth / 100 * width / 7 * 2, height / 16);
+
+  // draw enemy healthbar
+  fill("black");
+  rect(width / 7 * 4, height / 8, width / 7 * 2, height / 16);
+  fill("red");
+  enemyHealthBar = rect(width / 7 * 4, height / 8, currentEnemyHealth / 100 * width / 7 * 2, height / 16);
+
+  turnBasedBackAndForth();
 }
+
+// the actual combat functions
+function turnBasedBackAndForth() {
+  // the isYourTurn and button if statements are seperated into two if statements because its easier to manage and understand, they could be combined
+
+  // this branch of the isYourTurn statement controls your turn
+  if (isYourTurn) {
+    // check if you're hitting the attack button on your turn and subtract 20 from the enemy healthbar
+    if (mouseIsPressed && mouseX > width / 7 && mouseX < width / 7 * 3 && mouseY > height / 8 * 6 && mouseY < height / 8 * 7) {
+    currentEnemyHealth -= playerDamage;
+    isYourTurn = false; // this is not a != toggle because its easier to keep track of
+    delayBetweenTurnsTimer = millis();
+    }
+    // check if you're hitting the defend button on your turn and tell the game you're defending
+    else if (mouseIsPressed && mouseX > width / 7 * 4 && mouseX < width / 7 * 6 && mouseY > height / 8 * 6 && mouseY < height / 8 * 7) {
+    areYouDefending = true;
+    isYourTurn = false; // this is not a != toggle because its easier to keep track of
+    delayBetweenTurnsTimer = millis();
+    }
+  }
+  // this branch of the isYourTurn statement controls the enemy's turn
+  else {
+    // if enough time has passed as dictated by the betweenTurnsDelayValue (in milliseconds) the enemy takes their turn
+    // this branch is the default enemy damage branch and does the regular amount of damage
+    if (delayBetweenTurnsTimer + betweenTurnsDelayValue <= millis() && areYouDefending === false) {
+      currentHealth -= enemyDamage;
+      isYourTurn = true; // this is not a != toggle because its easier to keep track of
+    }
+    // this branch is for is you guarded the previous turn
+    else if (delayBetweenTurnsTimer + betweenTurnsDelayValue <= millis() && areYouDefending === true) {
+      currentHealth -= enemyDamage / 2;
+      isYourTurn = true; // this is not a != toggle because its easier to keep track of
+    }
+  }
+
+  // checking if the enemy is dead, if they are declare victory, remove you from combat, and because all enemies use the same health bar, reset said healthbar to maximums
+  if (currentEnemyHealth <= 0) {
+    victorious = true;
+    inCombat = false;
+    delayBetweenCombats = millis();
+  }
+
+  // are you dead check
+  if (currentHealth <= 0) {
+    gameOver = true;
+  }
+}
+
+// I noticed a bug where after you kill an enemy the attack the enemy would have made if you hadn't killed them with your previous attack will still subtract from your health
+// I cannot seem to fix it as all my attempts have been fruitless
