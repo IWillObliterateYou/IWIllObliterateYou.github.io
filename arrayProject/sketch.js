@@ -4,6 +4,8 @@
 //
 // Extra for Experts:
 // 
+// - Audio being played, it sounds awful (intentionally, I'm sorry I thought it was funny)
+// - A 2d array made with a 1d array
 
 let fieldMusic;
 
@@ -12,6 +14,7 @@ function preload() {
   characterImageFlipped = loadImage("characterFlipped.png");
   knightImage = loadImage("knight.png");
   fieldMusic = loadSound("fieldMusic.mp3");
+  enteringCombatSound = loadSound("enteringCombat.mp3");
 }
 
 // initializing variables
@@ -42,6 +45,7 @@ let playerDamage = 25;
 let delayBetweenCombats = -100;
 let gameOver = false;
 let delayBetweenTurnsTimer;
+let gameState = false; // indicates if you are in the game (true) or in the menu screen (false)
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -51,15 +55,11 @@ function setup() {
 
   characterXPos = width / 2;
   characterYPos = height / 2;
-
-  fieldMusic.jump(0);
-  fieldMusic.play();
-  fieldMusic.setLoop(true);
 }
 
 function draw() {
   // all visible functionality is dependant upon not being in the gameOver state
-  if (!gameOver) {
+  if (!gameOver && gameState) {
     // check whether or not to initiate the combat sequence, if not, display the enemies and do the check for if you hit an enemy, as well as the walls
     if (!inCombat) {
       background("green");
@@ -78,11 +78,30 @@ function draw() {
       battleScreen();
     }
   }
-  else {
+  else if (gameOver) {
     background("black");
     fill("black");
     stroke("white");
     text("Game Over", width / 2, height / 2);
+  }
+  else {
+    background(50, 50, 200);
+    textSize(100);
+    fill("red");
+    textAlign(CENTER, CENTER);
+    text("Welcome", width / 2, height / 3);
+
+    fill("grey");
+    rect(width / 3, height / 3 * 2, width / 3, height / 6);
+    fill("black");
+    text("Begin", width / 2, height / 4 * 3);
+
+    if (mouseIsPressed && mouseX > width / 3 && mouseX < width / 3 * 2 && mouseY > height / 3 * 2 && mouseY < height / 6 * 5) {
+      gameState = true;
+      fieldMusic.jump(0);
+      fieldMusic.play();
+      fieldMusic.setLoop(true);
+    }
   }
 }
 
@@ -146,6 +165,8 @@ function detectCharacterTileCollision(i) {
         inCombat = true;
         victorious = false;
         isYourTurn = true;
+        enteringCombatSound.jump(0);
+        enteringCombatSound.play();
       }
       currentEnemyHealth = maximumEnemyHealth; // resets the singular enemy health bar to full because they all share one
       // quick check to remove the enemy from the array
