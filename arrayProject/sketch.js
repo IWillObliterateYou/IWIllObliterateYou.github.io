@@ -5,9 +5,10 @@
 // Extra for Experts:
 // 
 // - Audio being played, it sounds awful (intentionally, I'm sorry I thought it was funny)
-// - A 2d array made with a 1d array
+// - A 2d array
 
 let fieldMusic;
+let enteringCombatSound;
 
 function preload() {
   characterImage = loadImage("character.png");
