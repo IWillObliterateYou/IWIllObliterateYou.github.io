@@ -45,15 +45,13 @@ function setup() {
   // else {
   //   squareSize = height / grid[0].length;
   // }
-
-
 }
 
 function draw() {
   background(220);
 
   drawGrid();
-  // labelGrid();
+  labelGrid();
 }
 
 function windowResized() {
@@ -116,7 +114,7 @@ function labelGrid(cols, rows) {
     else {
       fill("black");
     }
-    text(x + y, (x + 0.5) * squareSize, (y + 0.5) * squareSize);
+    text("x" + x + " " + "y" + y, (x + 0.5) * squareSize, (y + 0.5) * squareSize);
   }
 }
 
