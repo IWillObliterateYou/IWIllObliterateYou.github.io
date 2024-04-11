@@ -11,6 +11,7 @@
 - [Translate/Rotate](translate)
 - [Bubble Movement](bubble)
 - [2d Grid Demo](grid)
+- [2d Arrays Project](2dArrayProject)
 
 ## Projects
 - [Interactive Scene](InteractiveProject)
