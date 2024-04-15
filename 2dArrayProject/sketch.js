@@ -12,17 +12,25 @@
 // 
 
 let tileSize = 20;
+let levelOneString;
 
-let levelOne = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];
+function preload() {
+  let levelOneArray = [];
+  levelOneString = loadStrings("levelOne.txt");
+  for (let x = 0; x < levelOneString.length; x ++) {
+    if (levelOneString[x] === "|") {
+levelOneString.splice() // left off here  fawefeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      for (let y = 0; y < levelOneString.length; y ++) {
+        if (levelOneString[y] === ",") {
+
+        }
+      }
+    }
+  }
+}
+
+
+
 
 
 function setup() {
