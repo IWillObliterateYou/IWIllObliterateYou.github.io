@@ -16,10 +16,15 @@ let player = {
 };
 let grassTexture;
 let wallTexture;
+let backgroundMusic;
+let cantWalkThere;
+let gameState = "startScreen";
 
 function preload() {
   grassTexture = loadImage("grassTexture.png");
   wallTexture = loadImage("wallTexture.png");
+  backgroundMusic = loadSound("TownTheme.mp3");
+  cantWalkThere = loadSound("monster7.wav");
 }
 
 
@@ -38,13 +43,22 @@ function setup() {
 
   // add player to grid
   grid[player.y][player.x] = PLAYER;
+
+
+  // equalize sounds
+  backgroundMusic.setVolume(0.5);
+  cantWalkThere.setVolume(1.0);
 }
 
 function draw() {
-  background(220);
-
-  drawGrid();
-  // labelGrid();
+  if (gameState === "startScreen") {
+    background(0);
+  }
+  else if (gameState === "game") {
+    background(220);
+    drawGrid();
+    // labelGrid();
+  }
 }
 
 function windowResized() {
@@ -131,6 +145,11 @@ function keyPressed() {
   if (key === "d") {
     movePlayer(player.x + 1, player.y);
   }
+  if (key === " "  && gameState === "startScreen") {
+    gameState = "game";
+    backgroundMusic.play();
+    backgroundMusic.loop();
+  }
 }
 
 function movePlayer(xToBe, yToBe) {
@@ -150,6 +169,9 @@ function movePlayer(xToBe, yToBe) {
 
     // move player in drawing
     grid[player.y][player.x] = PLAYER;
+  }
+  else if (grid[yToBe][xToBe] === WALL) {
+    cantWalkThere.play();
   }
 }
 
