@@ -18,98 +18,53 @@
 // 2 is a basic enemy
 // 
 
-let tileSize = 20;
 let levelOneString;
 let grassImage;
 let highGroundImage;
+let levels;
+let highGround;
+let grass;
+const TILESONSCREENHORIZONTALLY = 10;
+let tileSize;
 
 function preload() {
-  levelOneString = loadStrings("levelOne.txt");
-  grassImage = loadImage("grass.jpg"); /// not indicating folder
-  highGroundImage = loadImage("highGround.jpg");
+  // levelOneString = loadStrings("levelOne.txt");
+  grassImage = loadImage("tiles/grass.jpg");
+  highGroundImage = loadImage("tiles/highGround.jpg");
+  levels = loadJSON("levels.json");
 }
-
-// tiles
-const HIGHGROUND = {
-  isPassible: false,
-  texture: highGroundImage,
-};
-
-const GRASS = {
-  isPassible: true,
-  texture: grassImage,
-};
-
-
-let levelOne = [[1, 1, 1, 1, 1, 1, 1, 1, 1 ,1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];
-
-
-
-function convertTxtLevelToArray(txtName) {
-// im giving up for now
-
-
-  let levelOneArray = [];
-  let tempArray = [];
-
-  // for (let y = 0; y < txtName.length; y ++) {
-  //   if (levelOneString[y] === "|") {
-  //     levelOneArray.push([]);
-  //     tempArray = levelOneArray.splice(0, y);
-
-  //     for (let x = 0; x < txtName.length; x ++) {
-  //       if (levelOneString[x] === ",") {
-  //         levelOneArray[y].splice();
-  //       }
-  //       else if (levelOneString[x] === "0") {
-  //         levelOneArray[y].push(0);
-  //       }
-  //       else if (levelOneString[x] === "1") {
-  //         levelOneArray[y].push(1);
-  //       }
-  //     }
-  //   }
-  // }
-  // return levelOneArray;
-
-  // for (let y = 0; y < txtName.length; y ++) {
-  //   for (let x = 0; x < txtName.length; x ++) { 
-  //     if (txtName[y][x] === "1") {
-  //       txtName[y].push(1);
-  //     }
-  //     else if (txtName[] === "0") {
-  //       txtName.psuH(0);
-  //     }
-  //   }
-  // }
-}
-
-
 
 function setup() {
-  if (windowHeight > windowWidth) {
-    createCanvas(windowWidth, windowWidth);
+  // make the biggest 16/9 display you can
+  if (windowHeight < windowWidth / 16 * 9) {
+    createCanvas(windowHeight / 9 * 16, windowHeight); // if the window height is smaller than the width would allow
   }
   else {
-    createCanvas(windowHeight, windowHeight);
+    createCanvas(windowWidth, windowWidth / 16 * 9); // the height of the window is enough to accomidate 16/9 off the width
   }
 
-  levelOne = convertTxtLevelToArray(levelOneString);
+  tileSize = width / 20;
+
+  givePropertiesToTiles();
+}
+
+function givePropertiesToTiles() {
+  // setting tiles as objects with all their properties
+  highGround = {
+    isPassible: false,
+    texture: highGroundImage,
+  };
+
+  grass = {
+    isPassible: true,
+    texture: grassImage,
+  };
 }
 
 function draw() {
   background(220);
 
-  drawLevel(levelOne);
+  drawLevel(levels.levelOne);
 }
 
 function drawLevel(level) {
@@ -119,11 +74,11 @@ function drawLevel(level) {
   noStroke();
   for (let y = 0; y < level.length; y ++) {
     for (let x = 0; x < level[y].length; x ++) {
-      if (level[y][x] === HIGHGROUND) {
-        image(HIGHGROUND.texture, x * tileSize, y * tileSize, tileSize, tileSize);
+      if (level[y][x] === 1) {
+        image(highGround.texture, x * tileSize, y * tileSize, tileSize, tileSize);
       }
-      else if (level[y][x] === GRASS) {
-        image(GRASS.texture, x * tileSize, y * tileSize, tileSize, tileSize);
+      else if (level[y][x] === 0) {
+        image(grass.texture, x * tileSize, y * tileSize, tileSize, tileSize);
       }
       // else if (level[y][x] === PLAYER) {
       //   fill("red");
