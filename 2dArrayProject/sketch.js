@@ -50,7 +50,7 @@ let levelOne = [[1, 1, 1, 1, 1, 1, 1, 1, 1 ,1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 1, 1, 1, 1, 1, 1, 1, 1 ,1]];
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];
 
 
 
@@ -96,7 +96,12 @@ function convertTxtLevelToArray(txtName) {
 
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  if (windowHeight > windowWidth) {
+    createCanvas(windowWidth, windowWidth);
+  }
+  else {
+    createCanvas(windowHeight, windowHeight);
+  }
 
   levelOne = convertTxtLevelToArray(levelOneString);
 }
@@ -117,7 +122,7 @@ function drawLevel(level) {
       if (level[y][x] === HIGHGROUND) {
         image(HIGHGROUND.texture, x * tileSize, y * tileSize, tileSize, tileSize);
       }
-      else if (grid[y][x] === GRASS) {
+      else if (level[y][x] === GRASS) {
         image(GRASS.texture, x * tileSize, y * tileSize, tileSize, tileSize);
       }
       // else if (level[y][x] === PLAYER) {
