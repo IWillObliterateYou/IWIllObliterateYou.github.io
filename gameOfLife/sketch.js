@@ -21,8 +21,13 @@
 let toggleType = "self";
 let grid;
 let squareSize;
-const GRID_SIZE = 30; 
+const GRID_SIZE = 40; 
 let autoPlay = false;
+let gosperGun;
+
+function preload() {
+  gosperGun = loadJSON("gosper.json");
+}
 
 function setup() {
   // use the smaller window dimesion to scale the canvas
@@ -186,6 +191,9 @@ function keyPressed() {
   }
   if (key ==="a") {
     autoPlay = !autoPlay;
+  }
+  if (key === "g") {
+    grid = gosperGun.gun;
   }
 }
 
