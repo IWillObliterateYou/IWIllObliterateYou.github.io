@@ -40,10 +40,10 @@ let previousPlayerTile = grass; // this reflects the type of tile the current lo
 function preload() {
   // levelOneString = loadStrings("levelOne.txt");
   grassImage = loadImage("tiles/grass.jpg");
-  highGroundImage = loadImage("tiles/highGround.jpg");
+  highGroundImage = loadImage("tiles/highGround.png");
   levels = loadJSON("levels.json");
   playerImage = loadImage("sprites/player.jpg");
-  pathwayImage = loadImage("tiles/pathway.jpg"); // not done yet
+  pathwayImage = loadImage("tiles/pathway.jpg"); 
 }
 
 function setup() {
@@ -120,7 +120,7 @@ function drawLevel(level) {
       }
       else if (level[y][x] === highGround) {
         // places the image at the location
-        image(highGround.texture, x * tileSize, y * tileSize, tileSize, tileSize);
+        image(highGround.texture, x * tileSize, (y - 0.5) * tileSize, tileSize, tileSize * 1.5); 
       }
       else if (level[y][x] === grass) {
         // places the image at the location
