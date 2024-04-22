@@ -43,16 +43,16 @@ function preload() {
   highGroundImage = loadImage("tiles/highGround.png");
   levels = loadJSON("levels.json");
   playerImage = loadImage("sprites/player.jpg");
-  pathwayImage = loadImage("tiles/pathway.jpg"); 
+  pathwayImage = loadImage("tiles/pathway.jpg");
 }
 
 function setup() {
-  // make the biggest 16/9 display you can
-  if (windowHeight < windowWidth / 16 * 9) {
-    createCanvas(windowHeight / 9 * 16, windowHeight); // if the window height is smaller than the width would allow
+  // make the biggest 20/11 tile display you can
+  if (windowHeight < windowWidth / 20 * 11) {
+    createCanvas(windowHeight / 11 * 20, windowHeight); // if the window height is smaller than the width would allow
   }
   else {
-    createCanvas(windowWidth, windowWidth / 16 * 9); // the height of the window is enough to accomidate 16/9 off the width
+    createCanvas(windowWidth, windowWidth / 20 * 11); // the height of the window is enough to accomidate the maximum width off the width
   }
 
   tileSize = width / 20;
@@ -74,7 +74,7 @@ function givePropertiesToTiles() {
     texture: grassImage,
   };
   previousPlayerTile = grass; // despite not technically fitting the bill of the function, this is important. 
-                              // Grass does not exist before this point as an object, and I need an object for previousPlayerTile
+  // Grass does not exist before this point as an object, and I need an object for previousPlayerTile
   pathway = {
     isPassible: true,
     texture: pathwayImage,
@@ -100,8 +100,8 @@ function drawLevel(level) {
   let yTilePosition = Math.floor(mouseY / tileSize);
 
   noStroke();
-  for (let y = 0; y < level.length; y ++) {
-    for (let x = 0; x < level[y].length; x ++) {
+  for (let y = 0; y < level.length; y++) {
+    for (let x = 0; x < level[y].length; x++) {
       if (level[y][x] === HIGHGROUND) {
         // replace numbers with objects in the level array
         level[y][x] = highGround;
@@ -120,7 +120,7 @@ function drawLevel(level) {
       }
       else if (level[y][x] === highGround) {
         // places the image at the location
-        image(highGround.texture, x * tileSize, (y - 0.5) * tileSize, tileSize, tileSize * 1.5); 
+        image(highGround.texture, x * tileSize, (y - 0.5) * tileSize, tileSize, tileSize * 1.5);
       }
       else if (level[y][x] === grass) {
         // places the image at the location
@@ -139,23 +139,24 @@ function drawLevel(level) {
 
 function movePlayer(xMovement, yMovement, currentLevel) {
   // the 9 is temporary and only reflects my test map
-  if (player.xPosition + xMovement <= 9 && player.xPosition + xMovement >= 0 && player.yPosition + yMovement <= 9 && player.yPosition + yMovement >= 0 // checks if you're off the map
-    && currentLevel[player.yPosition + yMovement][player.xPosition + xMovement].isPassible === true) { // checks if you're trying to enter a passible tile
-    // old location
-    let oldPlayerX = player.xPosition;
-    let oldPlayerY = player.yPosition;
+  if (currentLevel[player.yPosition + yMovement][player.xPosition + xMovement] != null) {
+    if (currentLevel[player.yPosition + yMovement][player.xPosition + xMovement].isPassible === true) { // checks if you're trying to enter a passible tile
+      // old location
+      let oldPlayerX = player.xPosition;
+      let oldPlayerY = player.yPosition;
 
-    // reset old location to be grass
-    currentLevel[oldPlayerY][oldPlayerX] = previousPlayerTile;
+      // reset old location to be grass
+      currentLevel[oldPlayerY][oldPlayerX] = previousPlayerTile;
 
-    previousPlayerTile = currentLevel[player.yPosition + yMovement][player.xPosition + xMovement];
+      previousPlayerTile = currentLevel[player.yPosition + yMovement][player.xPosition + xMovement];
 
-    // move player in code
-    player.xPosition += xMovement;
-    player.yPosition += yMovement;
+      // move player in code
+      player.xPosition += xMovement;
+      player.yPosition += yMovement;
 
-    // move player in drawing
-    currentLevel[player.yPosition][player.xPosition] = player;
+      // move player in drawing
+      currentLevel[player.yPosition][player.xPosition] = player;
+    }
   }
 }
 
