@@ -35,6 +35,8 @@ const PLAYER = 5;
 const HIGHGROUND = 1;
 const GRASS = 0;
 const PATHWAY = 3;
+let movementOfScreenX = 0;
+let movementOfScreenY = 0;
 let previousPlayerTile = grass; // this reflects the type of tile the current location of the player used to be
 
 function preload() {
@@ -60,7 +62,7 @@ function setup() {
   givePropertiesToTiles();
   givePropertiesToNPCsAndPlayer();
 
-  levels.levelOne[player.yPosition][player.xPosition] = 5;
+  levels.levelOne[player.yPosition][player.xPosition] = 5; // where the player starts off
 }
 
 function givePropertiesToTiles() {
@@ -120,59 +122,76 @@ function drawLevel(level) {
       }
       else if (level[y][x] === highGround) {
         // places the image at the location
-        image(highGround.texture, x * tileSize, (y - 0.5) * tileSize, tileSize, tileSize * 1.5);
+        image(highGround.texture, x * tileSize + movementOfScreenX, (y - 0.5) * tileSize + movementOfScreenY, tileSize, tileSize * 1.5);
       }
       else if (level[y][x] === grass) {
         // places the image at the location
-        image(grass.texture, x * tileSize, y * tileSize, tileSize, tileSize);
+        image(grass.texture, x * tileSize + movementOfScreenX, y * tileSize + movementOfScreenY, tileSize, tileSize);
       }
       else if (level[y][x] === pathway) {
-        image(pathway.texture, x * tileSize, y * tileSize, tileSize, tileSize);
+        image(pathway.texture, x * tileSize + movementOfScreenX, y * tileSize + movementOfScreenY, tileSize, tileSize);
       }
       // places the image at the location
       else if (level[y][x] === player) {
-        image(player.texture, x * tileSize, y * tileSize, tileSize, tileSize);
+        image(player.texture, x * tileSize + movementOfScreenX, y * tileSize + movementOfScreenY, tileSize, tileSize);
       }
     }
   }
 }
 
 function movePlayer(xMovement, yMovement, currentLevel) {
-  // the 9 is temporary and only reflects my test map
-  if (currentLevel[player.yPosition + yMovement][player.xPosition + xMovement] != null) {
-    if (currentLevel[player.yPosition + yMovement][player.xPosition + xMovement].isPassible === true) { // checks if you're trying to enter a passible tile
-      // old location
-      let oldPlayerX = player.xPosition;
-      let oldPlayerY = player.yPosition;
+  if (player.xPosition + xMovement >= 0 && player.xPosition + xMovement < currentLevel[player.yPosition].length // checks if you're trying to run off the map horizontally
+    && player.yPosition + yMovement >= 0 && player.yPosition + yMovement < currentLevel.length // checks if you're trying to run off the map vertically
+    && currentLevel[player.yPosition + yMovement][player.xPosition + xMovement].isPassible === true) { // checks if you're trying to enter a passible tile
+    // old location
+    let oldPlayerX = player.xPosition;
+    let oldPlayerY = player.yPosition;
 
-      // reset old location to be grass
-      currentLevel[oldPlayerY][oldPlayerX] = previousPlayerTile;
+    // reset old location to be grass
+    currentLevel[oldPlayerY][oldPlayerX] = previousPlayerTile;
 
-      previousPlayerTile = currentLevel[player.yPosition + yMovement][player.xPosition + xMovement];
+    previousPlayerTile = currentLevel[player.yPosition + yMovement][player.xPosition + xMovement];
 
-      // move player in code
-      player.xPosition += xMovement;
-      player.yPosition += yMovement;
+    // move player in code
+    player.xPosition += xMovement;
+    player.yPosition += yMovement;
 
-      // move player in drawing
-      currentLevel[player.yPosition][player.xPosition] = player;
-    }
+    // move player in drawing
+    currentLevel[player.yPosition][player.xPosition] = player;
   }
 }
 
 function keyPressed() {
   // player movement keys
   // the levelOne is temporary, only for testing. Its basically a magic number
+
+  // idea, move the array instead of the player to achieve the moving with the player illusion
+
+  // moving the player
+  // if (key === "w") {
+  //   movePlayer(0, -1, levels.levelOne);
+  // }
+  // if (key === "s") {
+  //   movePlayer(0, 1, levels.levelOne);
+  // }
+  // if (key === "a") {
+  //   movePlayer(-1, 0, levels.levelOne);
+  // }
+  // if (key === "d") {
+  //   movePlayer(1, 0, levels.levelOne);
+  // }
+
+  // moving the array
   if (key === "w") {
-    movePlayer(0, -1, levels.levelOne);
+    movementOfScreenY -= tileSize;
   }
   if (key === "s") {
-    movePlayer(0, 1, levels.levelOne);
+    movementOfScreenY += tileSize;
   }
   if (key === "a") {
-    movePlayer(-1, 0, levels.levelOne);
+    movementOfScreenX -= tileSize;
   }
   if (key === "d") {
-    movePlayer(1, 0, levels.levelOne);
+    movementOfScreenX += tileSize;
   }
 }
