@@ -25,19 +25,22 @@ let highGroundImage;
 let levels;
 let highGround;
 let grass;
-const TILESONSCREENHORIZONTALLY = 10;
 let tileSize;
 let playerImage;
 let player;
 let pathway;
 let pathwayImage;
+// these only are for the test level, there magic numbers that will change, but the ratio must be constant
+const TILESONSCREENHORIZONTALLY = 21;
+const TILESONSCREENVERTICALLY = 11;
+
 const PLAYER = 5;
 const HIGHGROUND = 1;
 const GRASS = 0;
 const PATHWAY = 3;
 let movementOfScreenX = 0;
 let movementOfScreenY = 0;
-let previousPlayerTile = grass; // this reflects the type of tile the current location of the player used to be
+let previousPlayerTile = grass; // this reflects the type of tile the current location of the player used to be, by default its grass
 
 function preload() {
   // levelOneString = loadStrings("levelOne.txt");
@@ -50,14 +53,14 @@ function preload() {
 
 function setup() {
   // make the biggest 20/11 tile display you can
-  if (windowHeight < windowWidth / 20 * 11) {
-    createCanvas(windowHeight / 11 * 20, windowHeight); // if the window height is smaller than the width would allow
+  if (windowHeight < windowWidth / TILESONSCREENHORIZONTALLY * TILESONSCREENVERTICALLY) {
+    createCanvas(windowHeight / TILESONSCREENVERTICALLY * TILESONSCREENHORIZONTALLY, windowHeight); // if the window height is smaller than the width would allow
   }
   else {
-    createCanvas(windowWidth, windowWidth / 20 * 11); // the height of the window is enough to accomidate the maximum width off the width
+    createCanvas(windowWidth, windowWidth / TILESONSCREENHORIZONTALLY * TILESONSCREENVERTICALLY); // the height of the window is enough to accomidate the maximum width off the width
   }
 
-  tileSize = width / 20;
+  tileSize = width / TILESONSCREENHORIZONTALLY;
 
   givePropertiesToTiles();
   givePropertiesToNPCsAndPlayer();
@@ -85,8 +88,8 @@ function givePropertiesToTiles() {
 
 function givePropertiesToNPCsAndPlayer() {
   player = {
-    xPosition: 4,
-    yPosition: 4,
+    yPosition: Math.floor(levels.levelOne.length / 2),
+    xPosition: Math.floor(levels.levelOne[Math.floor(levels.levelOne.length / 2)].length / 2),
     texture: playerImage,
   };
 }
@@ -102,6 +105,7 @@ function drawLevel(level) {
   let yTilePosition = Math.floor(mouseY / tileSize);
 
   noStroke();
+  // for every element of the level, check which type it is, numbers are converted to objects, and objects are displayed
   for (let y = 0; y < level.length; y++) {
     for (let x = 0; x < level[y].length; x++) {
       if (level[y][x] === HIGHGROUND) {
@@ -165,8 +169,6 @@ function keyPressed() {
   // player movement keys
   // the levelOne is temporary, only for testing. Its basically a magic number
 
-  // idea, move the array instead of the player to achieve the moving with the player illusion
-
   // moving the player
   // if (key === "w") {
   //   movePlayer(0, -1, levels.levelOne);
@@ -181,17 +183,57 @@ function keyPressed() {
   //   movePlayer(1, 0, levels.levelOne);
   // }
 
-  // moving the array
-  if (key === "w") {
+  // // moving the array
+  // if (key === "w") {
+  //   movementOfScreenY -= tileSize;
+  //   movePlayer(0, 1, levels.levelOne);
+  // }
+  // if (key === "s") {
+  //   movementOfScreenY += tileSize;
+  //   movePlayer(0, -1, levels.levelOne);
+  // }
+  // if (key === "a") {
+  //   movementOfScreenX -= tileSize;
+  //   movePlayer(1, 0, levels.levelOne);
+  // }
+  // if (key === "d") {
+  //   movementOfScreenX += tileSize;
+  //   movePlayer(-1, 0, levels.levelOne);
+  // }
+
+  // player.yPosition + 10 >= levels.levelOne.length
+
+  // the levels.levelOne is a magic number
+
+  if (player.yPosition - 5 <= 0 || player.yPosition + 5 >= levels.levelOne.length - 1) {
+    if (key === "w") {
+      movePlayer(0, -1, levels.levelOne);
+    }
+    else if (key === "s") {
+      movePlayer(0, 1, levels.levelOne);
+    }
+  }
+  else {
     movementOfScreenY -= tileSize;
+    movePlayer(0, 1, levels.levelOne);
   }
-  if (key === "s") {
-    movementOfScreenY += tileSize;
+
+// left off here working on stopping moving the array and instead moving the character when you reach the screens edge
+
+  if (player.xPosition - 10 <= 0 || player.xPosition + 10 >= levels.levelOne[player.yPosition].length - 1) {
+    if (key === "a") {
+      if (player.xPosition - 9 <= 0) {
+        movementOfScreenX -= tileSize;
+        movePlayer(1, 0, levels.levelOne);
+      }
+    }
+    else if (key === "d") {
+      movementOfScreenX += tileSize;
+      movePlayer(-1, 0, levels.levelOne);
+    }
   }
-  if (key === "a") {
-    movementOfScreenX -= tileSize;
-  }
-  if (key === "d") {
-    movementOfScreenX += tileSize;
+  else {
+    movementOfScreenY -= tileSize;
+    movePlayer(0, 1, levels.levelOne);
   }
 }
