@@ -30,6 +30,7 @@ let playerImage;
 let player;
 let pathway;
 let pathwayImage;
+let firstIteration = true;
 // these only are for the test level, there magic numbers that will change, but the ratio must be constant
 const TILESONSCREENHORIZONTALLY = 21;
 const TILESONSCREENVERTICALLY = 11;
@@ -38,8 +39,8 @@ const PLAYER = 5;
 const HIGHGROUND = 1;
 const GRASS = 0;
 const PATHWAY = 3;
-let movementOfScreenX = 0;
-let movementOfScreenY = 0;
+let movementOfScreenX;
+let movementOfScreenY;
 let previousPlayerTile = grass; // this reflects the type of tile the current location of the player used to be, by default its grass
 
 function preload() {
@@ -100,7 +101,25 @@ function draw() {
   drawLevel(levels.levelOne);
 }
 
+function determineHowFarOffTheScreenIsFromCentered(level) {
+  if (level.length > 21) {
+    movementOfScreenX = -1 * (level.length / 2 - 11);
+  }
+  if (level[player.yPosition].length > 11) {
+    movementOfScreenY = -1 * (level[player.yPosition].length / 2 - 6);
+  }
+  else {
+    movementOfScreenX = 0;
+    movementOfScreenY = 0;
+  }
+}
+
 function drawLevel(level) {
+  if (firstIteration === true) {
+    determineHowFarOffTheScreenIsFromCentered(level);
+    firstIteration = false;
+  }
+
   let xTilePosition = Math.floor(mouseX / tileSize);
   let yTilePosition = Math.floor(mouseY / tileSize);
 
@@ -126,18 +145,18 @@ function drawLevel(level) {
       }
       else if (level[y][x] === highGround) {
         // places the image at the location
-        image(highGround.texture, x * tileSize + movementOfScreenX, (y - 0.5) * tileSize + movementOfScreenY, tileSize, tileSize * 1.5);
+        image(highGround.texture, (x + movementOfScreenX) * tileSize, (y - 0.5 + movementOfScreenY) * tileSize, tileSize, tileSize * 1.5);
       }
       else if (level[y][x] === grass) {
         // places the image at the location
-        image(grass.texture, x * tileSize + movementOfScreenX, y * tileSize + movementOfScreenY, tileSize, tileSize);
+        image(grass.texture, (x + movementOfScreenX) * tileSize, (y + movementOfScreenY) * tileSize, tileSize, tileSize);
       }
       else if (level[y][x] === pathway) {
-        image(pathway.texture, x * tileSize + movementOfScreenX, y * tileSize + movementOfScreenY, tileSize, tileSize);
+        image(pathway.texture, (x + movementOfScreenX) * tileSize, (y + movementOfScreenY) * tileSize, tileSize, tileSize);
       }
       // places the image at the location
       else if (level[y][x] === player) {
-        image(player.texture, x * tileSize + movementOfScreenX, y * tileSize + movementOfScreenY, tileSize, tileSize);
+        image(player.texture, (x + movementOfScreenX) * tileSize, (y + movementOfScreenY) * tileSize, tileSize, tileSize);
       }
     }
   }
@@ -213,27 +232,33 @@ function keyPressed() {
       movePlayer(0, 1, levels.levelOne);
     }
   }
-  else {
-    movementOfScreenY -= tileSize;
+  else if (key === "w") {
+    movementOfScreenY += 1;
+    movePlayer(0, -1, levels.levelOne);
+  }
+  else if (key === "s") {
+    movementOfScreenY -= 1;
     movePlayer(0, 1, levels.levelOne);
   }
 
-// left off here working on stopping moving the array and instead moving the character when you reach the screens edge
+  // left off here working on stopping moving the array and instead moving the character when you reach the screens edge
 
-  if (player.xPosition - 10 <= 0 || player.xPosition + 10 >= levels.levelOne[player.yPosition].length - 1) {
+  if (player.xPosition - 10 <= 0 || player.xPosition + 10 >= levels.levelOne[player.yPosition].length - 1) { // are you close enough to the edge of the screen to prevent screen scroll
     if (key === "a") {
-      if (player.xPosition - 9 <= 0) {
-        movementOfScreenX -= tileSize;
-        movePlayer(1, 0, levels.levelOne);
-      }
-    }
-    else if (key === "d") {
-      movementOfScreenX += tileSize;
       movePlayer(-1, 0, levels.levelOne);
     }
+    else if (key === "d") {
+      movePlayer(1, 0, levels.levelOne);
+    }
   }
   else {
-    movementOfScreenY -= tileSize;
-    movePlayer(0, 1, levels.levelOne);
+    if (key === "a") {
+      movementOfScreenX += 1;
+      movePlayer(-1, 0, levels.levelOne);
+    }
+    if (key === "d") {
+      movementOfScreenX -= 1;
+      movePlayer(1, 0, levels.levelOne);
+    }
   }
 }
