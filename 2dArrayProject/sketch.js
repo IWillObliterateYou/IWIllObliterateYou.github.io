@@ -30,6 +30,7 @@ let playerImage;
 let player;
 let pathway;
 let pathwayImage;
+let currentLevel;
 let firstIteration = true;
 // these only are for the test level, there magic numbers that will change, but the ratio must be constant
 const TILESONSCREENHORIZONTALLY = 21;
@@ -101,12 +102,14 @@ function draw() {
   drawLevel(levels.levelOne);
 }
 
-function determineHowFarOffTheScreenIsFromCentered(level) {
-  if (level.length > 21) {
-    movementOfScreenX = -1 * (level.length / 2 - 11);
+function determineHowFarOffTheScreenIsFromCentered() {
+  // vertical
+  if (currentLevel.length > 21) {
+    movementOfScreenX = -1 * Math.floor(currentLevel.length / 2 - 10);
   }
-  if (level[player.yPosition].length > 11) {
-    movementOfScreenY = -1 * (level[player.yPosition].length / 2 - 6);
+  // horizontal
+  if (currentLevel[player.yPosition].length > 11) {
+    movementOfScreenY = -1 * Math.floor(currentLevel[player.yPosition].length / 2 - 5);
   }
   else {
     movementOfScreenX = 0;
@@ -115,8 +118,11 @@ function determineHowFarOffTheScreenIsFromCentered(level) {
 }
 
 function drawLevel(level) {
+  // the only purpose of the local variable "level" is to make it easier to call the function drawLevel,
+  // ex. now when you call it, that's all you need to do, as opposed to set the level and then call it
+  currentLevel = level; // do to the reliance on the "currentLevel" variable, this is an incredibly important line
   if (firstIteration === true) {
-    determineHowFarOffTheScreenIsFromCentered(level);
+    determineHowFarOffTheScreenIsFromCentered();
     firstIteration = false;
   }
 
@@ -125,44 +131,44 @@ function drawLevel(level) {
 
   noStroke();
   // for every element of the level, check which type it is, numbers are converted to objects, and objects are displayed
-  for (let y = 0; y < level.length; y++) {
-    for (let x = 0; x < level[y].length; x++) {
-      if (level[y][x] === HIGHGROUND) {
+  for (let y = 0; y < currentLevel.length; y++) {
+    for (let x = 0; x < currentLevel[y].length; x++) {
+      if (currentLevel[y][x] === HIGHGROUND) {
         // replace numbers with objects in the level array
-        level[y][x] = highGround;
+        currentLevel[y][x] = highGround;
       }
-      else if (level[y][x] === GRASS) {
+      else if (currentLevel[y][x] === GRASS) {
         // replace numbers with objects in the level array
-        level[y][x] = grass;
+        currentLevel[y][x] = grass;
       }
-      else if (level[y][x] === PLAYER) {
+      else if (currentLevel[y][x] === PLAYER) {
         // replace numbers with objects in the level array
-        level[y][x] = player;
+        currentLevel[y][x] = player;
       }
-      else if (level[y][x] === PATHWAY) {
+      else if (currentLevel[y][x] === PATHWAY) {
         // replace numbers with objects in the level array
-        level[y][x] = pathway;
+        currentLevel[y][x] = pathway;
       }
-      else if (level[y][x] === highGround) {
+      else if (currentLevel[y][x] === highGround) {
         // places the image at the location
         image(highGround.texture, (x + movementOfScreenX) * tileSize, (y - 0.5 + movementOfScreenY) * tileSize, tileSize, tileSize * 1.5);
       }
-      else if (level[y][x] === grass) {
+      else if (currentLevel[y][x] === grass) {
         // places the image at the location
         image(grass.texture, (x + movementOfScreenX) * tileSize, (y + movementOfScreenY) * tileSize, tileSize, tileSize);
       }
-      else if (level[y][x] === pathway) {
+      else if (currentLevel[y][x] === pathway) {
         image(pathway.texture, (x + movementOfScreenX) * tileSize, (y + movementOfScreenY) * tileSize, tileSize, tileSize);
       }
       // places the image at the location
-      else if (level[y][x] === player) {
+      else if (currentLevel[y][x] === player) {
         image(player.texture, (x + movementOfScreenX) * tileSize, (y + movementOfScreenY) * tileSize, tileSize, tileSize);
       }
     }
   }
 }
 
-function movePlayer(xMovement, yMovement, currentLevel) {
+function movePlayer(xMovement, yMovement) {
   if (player.xPosition + xMovement >= 0 && player.xPosition + xMovement < currentLevel[player.yPosition].length // checks if you're trying to run off the map horizontally
     && player.yPosition + yMovement >= 0 && player.yPosition + yMovement < currentLevel.length // checks if you're trying to run off the map vertically
     && currentLevel[player.yPosition + yMovement][player.xPosition + xMovement].isPassible === true) { // checks if you're trying to enter a passible tile
@@ -185,80 +191,52 @@ function movePlayer(xMovement, yMovement, currentLevel) {
 }
 
 function keyPressed() {
+  // currently very easy to de-center the character, in order to fix I need to determine if I'm close enough to stop screen scroll on a w, but not so close as to prevent a screen scrolled s
+
+
   // player movement keys
-  // the levelOne is temporary, only for testing. Its basically a magic number
-
-  // moving the player
-  // if (key === "w") {
-  //   movePlayer(0, -1, levels.levelOne);
-  // }
-  // if (key === "s") {
-  //   movePlayer(0, 1, levels.levelOne);
-  // }
-  // if (key === "a") {
-  //   movePlayer(-1, 0, levels.levelOne);
-  // }
-  // if (key === "d") {
-  //   movePlayer(1, 0, levels.levelOne);
-  // }
-
-  // // moving the array
-  // if (key === "w") {
-  //   movementOfScreenY -= tileSize;
-  //   movePlayer(0, 1, levels.levelOne);
-  // }
-  // if (key === "s") {
-  //   movementOfScreenY += tileSize;
-  //   movePlayer(0, -1, levels.levelOne);
-  // }
-  // if (key === "a") {
-  //   movementOfScreenX -= tileSize;
-  //   movePlayer(1, 0, levels.levelOne);
-  // }
-  // if (key === "d") {
-  //   movementOfScreenX += tileSize;
-  //   movePlayer(-1, 0, levels.levelOne);
-  // }
-
-  // player.yPosition + 10 >= levels.levelOne.length
-
-  // the levels.levelOne is a magic number
-
-  if (player.yPosition - 5 <= 0 || player.yPosition + 5 >= levels.levelOne.length - 1) {
+  // checks if you are too close to the edge of the screen to screen scroll
+  if (player.yPosition - 5 < 0 || player.yPosition + 5 >= currentLevel.length) {
     if (key === "w") {
-      movePlayer(0, -1, levels.levelOne);
+      movePlayer(0, -1);
+    } 
+    else if (key === "s" && player.yPosition - 5 === 0) {
+      movementOfScreenY -= 1;
+      movePlayer(0, 1);
     }
     else if (key === "s") {
-      movePlayer(0, 1, levels.levelOne);
+      movePlayer(0, 1);
     }
   }
+  // if you are stopped from moving by a solid object, the array is not stopped
+
+  // bug /\
+
   else if (key === "w") {
     movementOfScreenY += 1;
-    movePlayer(0, -1, levels.levelOne);
+    movePlayer(0, -1);
   }
   else if (key === "s") {
     movementOfScreenY -= 1;
-    movePlayer(0, 1, levels.levelOne);
+    movePlayer(0, 1);
   }
 
-  // left off here working on stopping moving the array and instead moving the character when you reach the screens edge
-
-  if (player.xPosition - 10 <= 0 || player.xPosition + 10 >= levels.levelOne[player.yPosition].length - 1) { // are you close enough to the edge of the screen to prevent screen scroll
+  if (player.xPosition - 10 <= 0 || player.xPosition + 10 >= currentLevel[player.yPosition].length) { // are you close enough to the edge of the screen to prevent screen scroll
     if (key === "a") {
-      movePlayer(-1, 0, levels.levelOne);
+      movePlayer(-1, 0);
     }
     else if (key === "d") {
-      movePlayer(1, 0, levels.levelOne);
+      movePlayer(1, 0);
     }
   }
   else {
     if (key === "a") {
       movementOfScreenX += 1;
-      movePlayer(-1, 0, levels.levelOne);
+      movePlayer(-1, 0);
     }
     if (key === "d") {
       movementOfScreenX -= 1;
-      movePlayer(1, 0, levels.levelOne);
+      movePlayer(1, 0);
     }
   }
 }
