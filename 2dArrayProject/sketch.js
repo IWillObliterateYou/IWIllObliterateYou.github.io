@@ -5,13 +5,6 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-// ideas: 
-// a map bigger than the canvas, use transformations to move the screen relative to the CharacterData, 
-// except if you get too close to the edge, in which case it stops moveing in that direction
-
-
-
-
 // in the level arrays
 // 0 is a grass
 // 1 is high ground (basically a wall)
@@ -32,10 +25,6 @@ let pathway;
 let pathwayImage;
 let currentLevel;
 let firstIteration = true;
-// these only are for the test level, there magic numbers that will change, but the ratio must be constant
-const TILESONSCREENHORIZONTALLY = 21;
-const TILESONSCREENVERTICALLY = 11;
-
 const PLAYER = 5;
 const HIGHGROUND = 1;
 const GRASS = 0;
@@ -43,6 +32,11 @@ const PATHWAY = 3;
 let movementOfScreenX;
 let movementOfScreenY;
 let previousPlayerTile = grass; // this reflects the type of tile the current location of the player used to be, by default its grass
+
+// these only are for the test level, there magic numbers that will change, but the ratio must be constant
+const TILESONSCREENHORIZONTALLY = 21;
+const TILESONSCREENVERTICALLY = 11;
+
 
 function preload() {
   // levelOneString = loadStrings("levelOne.txt");
@@ -104,7 +98,7 @@ function draw() {
 
 function determineHowFarOffTheScreenIsFromCentered() {
   // vertical
-  if (currentLevel.length > 21) {
+  if (currentLevel.length > TILESONSCREENHORIZONTALLY) {
     movementOfScreenX = -1 * Math.floor(currentLevel.length / 2 - 10);
   }
   // horizontal
@@ -170,8 +164,8 @@ function drawLevel(level) {
 
 function movePlayer(xMovement, yMovement) {
   if (player.xPosition + xMovement >= 0 && player.xPosition + xMovement < currentLevel[player.yPosition].length // checks if you're trying to run off the map horizontally
-    && player.yPosition + yMovement >= 0 && player.yPosition + yMovement < currentLevel.length // checks if you're trying to run off the map vertically
-    && currentLevel[player.yPosition + yMovement][player.xPosition + xMovement].isPassible === true) { // checks if you're trying to enter a passible tile
+    && player.yPosition + yMovement >= 0 && player.yPosition + yMovement < currentLevel.length) { // checks if you're trying to run off the map vertically
+
     // old location
     let oldPlayerX = player.xPosition;
     let oldPlayerY = player.yPosition;
@@ -191,50 +185,97 @@ function movePlayer(xMovement, yMovement) {
 }
 
 function keyPressed() {
-  // currently very easy to de-center the character, in order to fix I need to determine if I'm close enough to stop screen scroll on a w, but not so close as to prevent a screen scrolled s
-
-
   // player movement keys
   // checks if you are too close to the edge of the screen to screen scroll
-  if (player.yPosition - 5 < 0 || player.yPosition + 5 >= currentLevel.length) {
+
+  // vertical movement 
+  // to be clear: the cross line is the exact line at which the movement switches from a screen scroll to non-centered movement
+
+  // behind cross line 
+  if (player.yPosition < Math.floor(TILESONSCREENVERTICALLY / 2) || player.yPosition > currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
     if (key === "w") {
       movePlayer(0, -1);
-    } 
-    else if (key === "s" && player.yPosition - 5 === 0) {
-      movementOfScreenY -= 1;
-      movePlayer(0, 1);
     }
     else if (key === "s") {
       movePlayer(0, 1);
     }
   }
-  // if you are stopped from moving by a solid object, the array is not stopped
 
-  // bug /\
-
-  else if (key === "w") {
-    movementOfScreenY += 1;
-    movePlayer(0, -1);
+  // on cross line
+  // at top
+  else if (player.yPosition === Math.floor(TILESONSCREENVERTICALLY / 2) ) {
+    if (key === "w") {
+      movePlayer(0, -1);
+    }
+    else if (key === "s") {
+      movementOfScreenY -= 1;
+      movePlayer(0, 1);
+    }
   }
-  else if (key === "s") {
-    movementOfScreenY -= 1;
-    movePlayer(0, 1);
+  // at bottom
+  else if (player.yPosition === currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
+    if (key === "w") {
+      movementOfScreenY += 1;
+      movePlayer(0, -1);
+    }
+    else if (key === "s") {
+      movePlayer(0, 1);
+    }
   }
 
-  if (player.xPosition - 10 <= 0 || player.xPosition + 10 >= currentLevel[player.yPosition].length) { // are you close enough to the edge of the screen to prevent screen scroll
-    if (key === "a") {
+  // before cross line
+  else if (player.yPosition > 5 || player.yPosition < currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
+    if (key === "w") {
+      movementOfScreenY += 1;
+      movePlayer(0, -1);
+    }
+    else if (key === "s") {
+      movementOfScreenY -= 1;
+      movePlayer(0, 1);
+    }
+  }
+
+  // horizontal movement
+
+  // behind cross line 
+  if (player.xPosition < Math.floor(TILESONSCREENHORIZONTALLY / 2) || player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILESONSCREENHORIZONTALLY / 2 + 1)) {
+    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) { // are you trying to enter a nonsolid tile to your left
       movePlayer(-1, 0);
     }
-    else if (key === "d") {
+    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) { // are you trying to enter a nonsolid tile to your right
       movePlayer(1, 0);
     }
   }
-  else {
-    if (key === "a") {
+
+  // on cross line
+  // at left
+  else if (player.xPosition === Math.floor(TILESONSCREENHORIZONTALLY / 2)) {
+    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) {
+      movePlayer(-1, 0);
+    }
+    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) {
+      movementOfScreenX -= 1;
+      movePlayer(1, 0);
+    }
+  }
+  // at right
+  else if (player.xPosition === currentLevel[player.yPosition].length - Math.floor(TILESONSCREENHORIZONTALLY / 2 + 1)) {
+    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) {
       movementOfScreenX += 1;
       movePlayer(-1, 0);
     }
-    if (key === "d") {
+    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) {
+      movePlayer(1, 0);
+    }
+  }
+
+  // before cross line
+  else if (player.xPosition > Math.floor(TILESONSCREENHORIZONTALLY / 2) || player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILESONSCREENHORIZONTALLY / 2 + 1)) {
+    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) {
+      movementOfScreenX += 1;
+      movePlayer(-1, 0);
+    }
+    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) {
       movementOfScreenX -= 1;
       movePlayer(1, 0);
     }
