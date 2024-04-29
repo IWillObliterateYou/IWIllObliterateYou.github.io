@@ -34,8 +34,8 @@ let movementOfScreenY;
 let previousPlayerTile = grass; // this reflects the type of tile the current location of the player used to be, by default its grass
 
 // these only are for the test level, there magic numbers that will change, but the ratio must be constant
-const TILESONSCREENHORIZONTALLY = 21;
-const TILESONSCREENVERTICALLY = 11;
+const TILES_ON_SCREEN_HORIZONTALLY = 21;
+const TILES_ON_SCREEN_VERTICALLY = 11;
 
 
 function preload() {
@@ -49,14 +49,14 @@ function preload() {
 
 function setup() {
   // make the biggest 20/11 tile display you can
-  if (windowHeight < windowWidth / TILESONSCREENHORIZONTALLY * TILESONSCREENVERTICALLY) {
-    createCanvas(windowHeight / TILESONSCREENVERTICALLY * TILESONSCREENHORIZONTALLY, windowHeight); // if the window height is smaller than the width would allow
+  if (windowHeight < windowWidth / TILES_ON_SCREEN_HORIZONTALLY * TILES_ON_SCREEN_VERTICALLY) {
+    createCanvas(windowHeight / TILES_ON_SCREEN_VERTICALLY * TILES_ON_SCREEN_HORIZONTALLY, windowHeight); // if the window height is smaller than the width would allow
   }
   else {
-    createCanvas(windowWidth, windowWidth / TILESONSCREENHORIZONTALLY * TILESONSCREENVERTICALLY); // the height of the window is enough to accomidate the maximum width off the width
+    createCanvas(windowWidth, windowWidth / TILES_ON_SCREEN_HORIZONTALLY * TILES_ON_SCREEN_VERTICALLY); // the height of the window is enough to accomidate the maximum width off the width
   }
 
-  tileSize = width / TILESONSCREENHORIZONTALLY;
+  tileSize = width / TILES_ON_SCREEN_HORIZONTALLY;
 
   givePropertiesToTiles();
   givePropertiesToNPCsAndPlayer();
@@ -98,7 +98,7 @@ function draw() {
 
 function determineHowFarOffTheScreenIsFromCentered() {
   // vertical
-  if (currentLevel.length > TILESONSCREENHORIZONTALLY) {
+  if (currentLevel.length > TILES_ON_SCREEN_HORIZONTALLY) {
     movementOfScreenX = -1 * Math.floor(currentLevel.length / 2 - 10);
   }
   // horizontal
@@ -182,6 +182,43 @@ function movePlayer(xMovement, yMovement) {
     // move player in drawing
     currentLevel[player.yPosition][player.xPosition] = player;
   }
+
+  // screen scroll
+
+  if (yMovement === 1 && // if you are moving down and one of the following are true, scroll activate screen scroll
+    (player.yPosition === Math.floor(TILES_ON_SCREEN_VERTICALLY / 2) // you are on the cross line at the top (the cross line is the line where you deactivate screen scroll)
+      || 
+      player.yPosition > Math.floor(TILES_ON_SCREEN_VERTICALLY / 2)  // you are before the cross line at the top and before the cross line on the bottom
+      && player.yPosition <= currentLevel.length - Math.floor(TILES_ON_SCREEN_VERTICALLY / 2 + 1))) {
+
+    movementOfScreenY -= 1;
+  }
+  else if (yMovement === -1 &&
+    (player.yPosition === currentLevel.length - Math.floor(TILES_ON_SCREEN_VERTICALLY / 2 + 1)
+    || 
+    player.yPosition > Math.floor(TILES_ON_SCREEN_VERTICALLY / 2)  // you are before the cross line at the top and before the cross line on the bottom
+    && player.yPosition < currentLevel.length - Math.floor(TILES_ON_SCREEN_VERTICALLY / 2 + 1))) {
+
+    movementOfScreenY += 1;
+  }
+
+  else if (xMovement === 1 &&
+    (player.xPosition === Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2)
+      || 
+      player.xPosition > Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2)
+      && player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 1))) {
+
+    movementOfScreenX -= 1;
+  }
+
+  else if (xMovement === -1 &&
+    (player.xPosition === currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 1)
+      || 
+      player.xPosition > Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2)
+      && player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 1))) {
+
+    movementOfScreenX += 1;
+  }
 }
 
 function keyPressed() {
@@ -192,92 +229,20 @@ function keyPressed() {
   // to be clear: the cross line is the exact line at which the movement switches from a screen scroll to non-centered movement
 
   // behind cross line 
-  if (player.yPosition < Math.floor(TILESONSCREENVERTICALLY / 2) || player.yPosition > currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
-    if (key === "w") {
-      movePlayer(0, -1);
-    }
-    else if (key === "s") {
-      movePlayer(0, 1);
-    }
+  if (key === "w") {
+    movePlayer(0, -1);
   }
-
-  // on cross line
-  // at top
-  else if (player.yPosition === Math.floor(TILESONSCREENVERTICALLY / 2) ) {
-    if (key === "w") {
-      movePlayer(0, -1);
-    }
-    else if (key === "s") {
-      movementOfScreenY -= 1;
-      movePlayer(0, 1);
-    }
-  }
-  // at bottom
-  else if (player.yPosition === currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
-    if (key === "w") {
-      movementOfScreenY += 1;
-      movePlayer(0, -1);
-    }
-    else if (key === "s") {
-      movePlayer(0, 1);
-    }
-  }
-
-  // before cross line
-  else if (player.yPosition > 5 || player.yPosition < currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
-    if (key === "w") {
-      movementOfScreenY += 1;
-      movePlayer(0, -1);
-    }
-    else if (key === "s") {
-      movementOfScreenY -= 1;
-      movePlayer(0, 1);
-    }
+  else if (key === "s") {
+    movePlayer(0, 1);
   }
 
   // horizontal movement
 
   // behind cross line 
-  if (player.xPosition < Math.floor(TILESONSCREENHORIZONTALLY / 2) || player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILESONSCREENHORIZONTALLY / 2 + 1)) {
-    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) { // are you trying to enter a nonsolid tile to your left
-      movePlayer(-1, 0);
-    }
-    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) { // are you trying to enter a nonsolid tile to your right
-      movePlayer(1, 0);
-    }
+  if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) { // are you trying to enter a nonsolid tile to your left
+    movePlayer(-1, 0);
   }
-
-  // on cross line
-  // at left
-  else if (player.xPosition === Math.floor(TILESONSCREENHORIZONTALLY / 2)) {
-    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) {
-      movePlayer(-1, 0);
-    }
-    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) {
-      movementOfScreenX -= 1;
-      movePlayer(1, 0);
-    }
-  }
-  // at right
-  else if (player.xPosition === currentLevel[player.yPosition].length - Math.floor(TILESONSCREENHORIZONTALLY / 2 + 1)) {
-    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) {
-      movementOfScreenX += 1;
-      movePlayer(-1, 0);
-    }
-    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) {
-      movePlayer(1, 0);
-    }
-  }
-
-  // before cross line
-  else if (player.xPosition > Math.floor(TILESONSCREENHORIZONTALLY / 2) || player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILESONSCREENHORIZONTALLY / 2 + 1)) {
-    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) {
-      movementOfScreenX += 1;
-      movePlayer(-1, 0);
-    }
-    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) {
-      movementOfScreenX -= 1;
-      movePlayer(1, 0);
-    }
+  else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) { // are you trying to enter a nonsolid tile to your right
+    movePlayer(1, 0);
   }
 }
