@@ -186,23 +186,15 @@ function movePlayer(xMovement, yMovement) {
   // screen scroll
 
   if (yMovement === 1 && // if you are moving down and one of the following are true, scroll activate screen scroll
-    (player.yPosition === Math.floor(TILES_ON_SCREEN_VERTICALLY / 2 + 1) // you are on the cross line at the top (the cross line is the line where you deactivate screen scroll)
+    (player.yPosition === Math.floor(TILES_ON_SCREEN_VERTICALLY / 2) // you are on the cross line at the top (the cross line is the line where you deactivate screen scroll)
       || 
       player.yPosition > Math.floor(TILES_ON_SCREEN_VERTICALLY / 2)  // you are before the cross line at the top and before the cross line on the bottom
-      && player.yPosition < currentLevel.length - Math.floor(TILES_ON_SCREEN_VERTICALLY / 2))) {
+      && player.yPosition <= currentLevel.length - Math.floor(TILES_ON_SCREEN_VERTICALLY / 2 + 1))) {
 
     movementOfScreenY -= 1;
   }
-  // I think I've found an honest to goodness bug beyond my expertise. When I am in a position where I try to move down and the 
-  // player.yPosition is 5 the screen does not scroll and when the player.yPosition is 4 it does. I am baffled
-  // if (yMovement === 1 && 
-  //    player.yPosition === 5) {
-
-  //   movementOfScreenY -= 1;
-  // }
-
   else if (yMovement === -1 &&
-    (player.yPosition === Math.floor(TILES_ON_SCREEN_VERTICALLY / 2) // on the top cross line
+    (player.yPosition === currentLevel.length - Math.floor(TILES_ON_SCREEN_VERTICALLY / 2 + 1)
     || 
     player.yPosition > Math.floor(TILES_ON_SCREEN_VERTICALLY / 2)  // you are before the cross line at the top and before the cross line on the bottom
     && player.yPosition < currentLevel.length - Math.floor(TILES_ON_SCREEN_VERTICALLY / 2 + 1))) {
@@ -211,10 +203,10 @@ function movePlayer(xMovement, yMovement) {
   }
 
   else if (xMovement === 1 &&
-    (player.xPosition === Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 1)
+    (player.xPosition === Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2)
       || 
       player.xPosition > Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2)
-      && player.xPosition < currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2))) {
+      && player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 1))) {
 
     movementOfScreenX -= 1;
   }
@@ -222,22 +214,11 @@ function movePlayer(xMovement, yMovement) {
   else if (xMovement === -1 &&
     (player.xPosition === currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 1)
       || 
-      (player.xPosition > Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2)
-      && player.xPosition < currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 2)))) {
+      player.xPosition > Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2)
+      && player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILES_ON_SCREEN_HORIZONTALLY / 2 + 1))) {
 
     movementOfScreenX += 1;
   }
-
-  // again I have encountered this bizarre bug, if I input my if statement into the console at a player.xPosition of 21 it returns false, 
-  // yet when I run the code, it moves the screen as if that exact statement decided to turn itself on when it shouldn't
-  // else if (xMovement === -1 &&
-  //   (player.xPosition === 20
-  //     || 
-  //     player.xPosition > 10
-  //     && player.xPosition < 20)) {
-
-  //   movementOfScreenX += 1;
-  // }
 }
 
 function keyPressed() {
@@ -257,6 +238,7 @@ function keyPressed() {
 
   // horizontal movement
 
+  // behind cross line 
   if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) { // are you trying to enter a nonsolid tile to your left
     movePlayer(-1, 0);
   }
