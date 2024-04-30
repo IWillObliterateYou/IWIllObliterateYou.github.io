@@ -1,17 +1,18 @@
-// 2D Array Project
-// Your Name
-// Date
+// 2D Array Project: An RPG Proof of Concept
+// Seth Gardiner
+// April 30th 2024
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - logic, expandability
+// - many levels in one JSON, all retrievable
 
 // in the level arrays
 // 0 is a grass
 // 1 is high ground (basically a wall)
-// 2 is a basic enemy
 // 3 is a pathway
-// 5 is the player
+// 5 is the player 
 
+// initiallizing variables
 let levelOneString;
 let grassImage;
 let highGroundImage;
@@ -31,9 +32,9 @@ const GRASS = 0;
 const PATHWAY = 3;
 let movementOfScreenX;
 let movementOfScreenY;
-let previousPlayerTile = grass; // this reflects the type of tile the current location of the player used to be, by default its grass
+let previousPlayerTile; 
 
-// these only are for the test level, there magic numbers that will change, but the ratio must be constant
+// the ratio under no circumstances can be changed, everything will break
 const TILESONSCREENHORIZONTALLY = 21;
 const TILESONSCREENVERTICALLY = 11;
 
@@ -74,8 +75,8 @@ function givePropertiesToTiles() {
     isPassible: true,
     texture: grassImage,
   };
-  previousPlayerTile = grass; // despite not technically fitting the bill of the function, this is important. 
-  // Grass does not exist before this point as an object, and I need an object for previousPlayerTile
+  previousPlayerTile = grass; // despite not technically fitting the bill of the function, this is important to be here as grass as an object does not exist before here, 
+  // previousPlayerTile can be set to anything, it just indicates what the player is initially standing on
   pathway = {
     isPassible: true,
     texture: pathwayImage,
@@ -84,6 +85,7 @@ function givePropertiesToTiles() {
 
 function givePropertiesToNPCsAndPlayer() {
   player = {
+    // plops the character dead center of the screen
     yPosition: Math.floor(levels.levelOne.length / 2),
     xPosition: Math.floor(levels.levelOne[Math.floor(levels.levelOne.length / 2)].length / 2),
     texture: playerImage,
@@ -93,22 +95,14 @@ function givePropertiesToNPCsAndPlayer() {
 function draw() {
   background(220);
 
+  // currently there is no functionality to switch between levels
+  // any mention of levelOne is currenly a magic number situation
   drawLevel(levels.levelOne);
 }
 
-function determineHowFarOffTheScreenIsFromCentered() {
-  // vertical
-  if (currentLevel.length > TILESONSCREENHORIZONTALLY) {
-    movementOfScreenX = -1 * Math.floor(currentLevel.length / 2 - 10);
-  }
-  // horizontal
-  if (currentLevel[player.yPosition].length > 11) {
-    movementOfScreenY = -1 * Math.floor(currentLevel[player.yPosition].length / 2 - 5);
-  }
-  else {
-    movementOfScreenX = 0;
-    movementOfScreenY = 0;
-  }
+function centerScreenOnCharacter() {
+  movementOfScreenX = -1 * player.xPosition + Math.floor(TILESONSCREENHORIZONTALLY / 2);
+  movementOfScreenY = -1 * player.yPosition + Math.floor(TILESONSCREENVERTICALLY / 2);
 }
 
 function drawLevel(level) {
@@ -116,12 +110,9 @@ function drawLevel(level) {
   // ex. now when you call it, that's all you need to do, as opposed to set the level and then call it
   currentLevel = level; // do to the reliance on the "currentLevel" variable, this is an incredibly important line
   if (firstIteration === true) {
-    determineHowFarOffTheScreenIsFromCentered();
+    centerScreenOnCharacter();
     firstIteration = false;
   }
-
-  let xTilePosition = Math.floor(mouseX / tileSize);
-  let yTilePosition = Math.floor(mouseY / tileSize);
 
   noStroke();
   // for every element of the level, check which type it is, numbers are converted to objects, and objects are displayed
@@ -163,16 +154,12 @@ function drawLevel(level) {
 }
 
 function movePlayer(xMovement, yMovement) {
-  if (player.xPosition + xMovement >= 0 && player.xPosition + xMovement < currentLevel[player.yPosition].length // checks if you're trying to run off the map horizontally
-    && player.yPosition + yMovement >= 0 && player.yPosition + yMovement < currentLevel.length) { // checks if you're trying to run off the map vertically
-
     // old location
     let oldPlayerX = player.xPosition;
     let oldPlayerY = player.yPosition;
 
-    // reset old location to be grass
+    // reset old location to be whatever the last tile was
     currentLevel[oldPlayerY][oldPlayerX] = previousPlayerTile;
-
     previousPlayerTile = currentLevel[player.yPosition + yMovement][player.xPosition + xMovement];
 
     // move player in code
@@ -181,10 +168,22 @@ function movePlayer(xMovement, yMovement) {
 
     // move player in drawing
     currentLevel[player.yPosition][player.xPosition] = player;
-  }
 }
 
 function keyPressed() {
+  // I am fully aware that checking if the block I am about to run into is solid 16 times is inefficient, 
+  // as is spreading out all the possible circumstances of how you can move and if the screen should scroll. 
+  // however, this is a reverted version of the code, because in my attempts to consolidate, I believe I have come across a bug outside of my control
+  // For the purpose of the current code, which does not contain the bug, the following explanation of is pointless. 
+  // I attemt to run an if statement wherein I check to see if the character is at an x position of 20, and if it is and I move to the left, scroll the screen. 
+  // At an x position of 20, the screen does not scroll. Instead, at an x position of 21, the screen scrolls despite no command indicating to do so. 
+  // I confimed in the console my logic is correct, when inputted in the console, the if statement logic returns false, then when I run the code
+  // it procedes as if it returned true. I was utterly unable to fix this problem, and thus removed it completely. 
+
+
+
+  // a bug exists where if you are on the cross line of both the top and bottom (or left and right) simultaneously it scrolls the screen when it should not
+
   // player movement keys
   // checks if you are too close to the edge of the screen to screen scroll
 
@@ -193,10 +192,15 @@ function keyPressed() {
 
   // behind cross line 
   if (player.yPosition < Math.floor(TILESONSCREENVERTICALLY / 2) || player.yPosition > currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
-    if (key === "w") {
+    if (key === "w" 
+    // thanks to needing to check for solid tiles here, I cannot move the check for running off the map into the movePlayer function
+    && player.yPosition - 1 >= 0 // checking if you are running off the map
+    && currentLevel[player.yPosition - 1][player.xPosition].isPassible === true) { // checks if the block you're trying to enter is passible, needs to be checked last so as not to be checking the state of undefined
       movePlayer(0, -1);
     }
-    else if (key === "s") {
+    else if (key === "s" 
+    && player.yPosition + 1 <= currentLevel.length - 1 // checking if you are running off the map
+    && currentLevel[player.yPosition + 1][player.xPosition].isPassible === true) {
       movePlayer(0, 1);
     }
   }
@@ -204,32 +208,32 @@ function keyPressed() {
   // on cross line
   // at top
   else if (player.yPosition === Math.floor(TILESONSCREENVERTICALLY / 2) ) {
-    if (key === "w") {
+    if (key === "w" && currentLevel[player.yPosition - 1][player.xPosition].isPassible === true) {
       movePlayer(0, -1);
     }
-    else if (key === "s") {
+    else if (key === "s" && currentLevel[player.yPosition + 1][player.xPosition].isPassible === true) {
       movementOfScreenY -= 1;
       movePlayer(0, 1);
     }
   }
   // at bottom
   else if (player.yPosition === currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
-    if (key === "w") {
+    if (key === "w" && currentLevel[player.yPosition - 1][player.xPosition].isPassible === true) {
       movementOfScreenY += 1;
       movePlayer(0, -1);
     }
-    else if (key === "s") {
+    else if (key === "s" && currentLevel[player.yPosition + 1][player.xPosition].isPassible === true) {
       movePlayer(0, 1);
     }
   }
 
   // before cross line
   else if (player.yPosition > 5 || player.yPosition < currentLevel.length - Math.floor(TILESONSCREENVERTICALLY / 2 + 1) ) {
-    if (key === "w") {
+    if (key === "w" && currentLevel[player.yPosition - 1][player.xPosition].isPassible === true) {
       movementOfScreenY += 1;
       movePlayer(0, -1);
     }
-    else if (key === "s") {
+    else if (key === "s" && currentLevel[player.yPosition + 1][player.xPosition].isPassible === true) {
       movementOfScreenY -= 1;
       movePlayer(0, 1);
     }
@@ -239,10 +243,14 @@ function keyPressed() {
 
   // behind cross line 
   if (player.xPosition < Math.floor(TILESONSCREENHORIZONTALLY / 2) || player.xPosition > currentLevel[player.yPosition].length - Math.floor(TILESONSCREENHORIZONTALLY / 2 + 1)) {
-    if (key === "a" && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) { // are you trying to enter a nonsolid tile to your left
+    if (key === "a" 
+    && player.xPosition - 1 >= 0 // checking if you are running off the map
+    && currentLevel[player.yPosition][player.xPosition - 1].isPassible === true) { // are you trying to enter a nonsolid tile to your left
       movePlayer(-1, 0);
     }
-    else if (key === "d" && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) { // are you trying to enter a nonsolid tile to your right
+    else if (key === "d" 
+    && player.xPosition + 1 <= currentLevel[player.yPosition].length - 1 // checking if you are running off the map
+    && currentLevel[player.yPosition][player.xPosition + 1].isPassible === true) { // are you trying to enter a nonsolid tile to your right
       movePlayer(1, 0);
     }
   }
