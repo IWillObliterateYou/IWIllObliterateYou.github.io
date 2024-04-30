@@ -12,6 +12,7 @@
 - [Bubble Movement](bubble)
 - [2d Grid Demo](grid)
 - [2d Arrays Project](2dArrayProject)
+- [WalkerOOP](OOPDemo)
 
 ## Projects
 - [Interactive Scene](InteractiveProject)
