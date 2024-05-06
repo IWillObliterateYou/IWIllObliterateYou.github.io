@@ -13,6 +13,7 @@
 - [2d Grid Demo](grid)
 - [2d Arrays Project](2dArrayProject)
 - [WalkerOOP](OOPDemo)
+- [Connected Nodes OOP](nodes)
 
 ## Projects
 - [Interactive Scene](InteractiveProject)
