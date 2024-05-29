@@ -16,6 +16,7 @@
 - [Connected Nodes OOP](nodes)
 - [Clickable Button Demo](clickable)
 - [Recursion Circles](recusionCircles)
+- [Sierpinski Triangle](sierpinski)
 
 ## Projects
 - [Interactive Scene](InteractiveProject)
