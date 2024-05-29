@@ -15,6 +15,7 @@
 - [WalkerOOP](OOPDemo)
 - [Connected Nodes OOP](nodes)
 - [Clickable Button Demo](clickable)
+- [Recursion Circles](recusionCircles)
 
 ## Projects
 - [Interactive Scene](InteractiveProject)
